@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Modal from "../components/Modal";
 import Button from "../components/Button";
-import Textarea from "../components/TextArea";
+import Textarea from "../components/Textarea";
 import LoginForm from "../components/LoginForm";
 
 

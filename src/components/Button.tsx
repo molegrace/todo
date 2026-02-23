@@ -7,6 +7,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
   variant?: ButtonVariant;
   onClick?: () => void;
+
 }
 
 const baseStyle =
