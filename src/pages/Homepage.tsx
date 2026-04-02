@@ -16,14 +16,14 @@ const Home: React.FC = () => {
       <div className="flex gap-4">
         <Link
           to="/register"
-          className="bg-primary-300 text-white px-6 py-3 rounded-lg hover:bg-primary-500 transition"
+          className="bg-main-400 text-white px-6 py-3 rounded-lg hover:bg-main-500 transition"
         >
           Get Started
         </Link>
 
         <Link
           to="/about"
-          className="border border-primary-300 text-primary-500 px-6 py-3 rounded-lg hover:bg-primary-200 transition"
+          className="border border-main-300 text-main-500 px-6 py-3 rounded-lg transition"
         >
           Learn More
         </Link>

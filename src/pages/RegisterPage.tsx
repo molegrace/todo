@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Input from "../components/Input";
-import Select from "../components/Dropdown";
 import Checkbox from "../components/Checkbox";
 import Button from "../components/Button";
 import { Link } from "react-router-dom";
@@ -11,7 +10,6 @@ const SignupPage: React.FC = () => {
     email: "",
     password: "",
     con_password: "",
-    role: "",
     agree: false,
   });
 
@@ -33,8 +31,8 @@ const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full  max-w-md bg-white p-6 rounded shadow">
+    <div className="min-h-screen bg-gray-100 px-4 py-10 sm:py-16">
+      <div className="mx-auto w-full max-w-md rounded-2xl bg-white p-6 shadow">
         <h2 className="text-3xl font-bold mb-6 text-center">Sign Up</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -81,19 +79,6 @@ const SignupPage: React.FC = () => {
             required
           />
 
-          <Select
-            label="Role"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            options={[
-              { label: "Select role", value: "" },
-              { label: "User", value: "user" },
-              { label: "Admin", value: "admin" },
-            ]}
-            required
-          />
-
           <Checkbox
             label="I agree to the terms and conditions"
             name="agree"
@@ -102,13 +87,13 @@ const SignupPage: React.FC = () => {
             required
           />
 
-          <Button type="submit" label="Create Account" />
+          <Button type="submit" label="Create Account" className="w-full" />
 
           <p className="text-center text-sm text-gray-600 mt-4">
             Already have an account?{" "}
             <Link
               to="/login"
-              className="text-green-600 font-medium hover:underline"
+              className="text-main-600 font-medium hover:underline"
             >
               Login
             </Link>

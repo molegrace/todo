@@ -20,7 +20,7 @@ const Contact: React.FC = () => {
   return (
     <div className="min-h-screen  flex items-center justify-center px-6">
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-lg">
-        <h2 className="text-3xl font-bold text-green-700  mb-6 text-center">
+        <h2 className="text-3xl font-bold text-main-700  mb-6 text-center">
           Contact Us
         </h2>
 
@@ -34,13 +34,13 @@ const Contact: React.FC = () => {
             placeholder="Your Message"
             rows={4}
             onChange={handleChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main-500 outline-none"
             required
           />
 
           <button
             type="submit"
-            className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+            className="bg-main-400 text-white py-2 rounded-lg hover:bg-main-500 transition"
           >
             Send Message
           </button>

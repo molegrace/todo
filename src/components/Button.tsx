@@ -14,7 +14,7 @@ const baseStyle =
   "px-4 py-2 rounded font-medium transition focus:outline-none";
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: "bg-green-400 text-white hover:bg-green-500",
+  primary: "bg-main-400 text-white hover:bg-main-500",
   secondary: "bg-gray-600 text-white hover:bg-gray-700",
   danger: "bg-red-600 text-white hover:bg-red-700",
 };
