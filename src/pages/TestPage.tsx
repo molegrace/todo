@@ -10,7 +10,7 @@ const TestPage: React.FC = () => {
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center bg-main-50">
     <Button label="open modal" onClick={openModal}></Button>
     <Modal isOpen={isModalOpen} onClose={closeModal}>
         <LoginForm/>

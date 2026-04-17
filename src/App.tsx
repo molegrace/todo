@@ -6,19 +6,28 @@ import TestPage from "./pages/TestPage";
 import ContactUs from "./pages/ContactUs";
 import AboutPage from "./pages/AboutPage";
 import Homepage from "./pages/Homepage";
+import DashboardPage from "./pages/DashboardPage";
+import TasksPage from "./pages/TasksPage";
+import ListsPage from "./pages/ListsPage";
+import { DashboardProvider } from "./context/DashboardContext";
 
 function App() {
   return (
 <>
 <Navbar title="Todo App" />
-  <Routes>
+    <DashboardProvider>
+    <Routes>
     <Route path="/" element={<Homepage/>} />
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/dashboard/tasks" element={<TasksPage />} />
+      <Route path="/dashboard/lists" element={<ListsPage />} />
       <Route path="/login" element={<LoginForm />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/test" element={<TestPage />} />
       <Route path="/contact" element={<ContactUs/>} />
       <Route path="/about" element={<AboutPage/>} />
     </Routes>
+    </DashboardProvider>
  </>
   );
  

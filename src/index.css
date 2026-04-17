@@ -4,17 +4,17 @@
   --color-black: #000;
   --color-white: #fff;
 
-  --main-50: var(--color-neutral-50);
-  --main-100: var(--color-neutral-100);
-  --main-200: var(--color-neutral-200);
-  --main-300: var(--color-neutral-300);
-  --main-400: var(--color-neutral-400);
-  --main-500: var(--color-neutral-500);
-  --main-600: var(--color-neutral-600);
-  --main-700: var(--color-neutral-700);
-  --main-800: var(--color-neutral-800);
-  --main-900: var(--color-neutral-900);
-  --main-950: var(--color-neutral-950);
+  --main-50: var(--color-blue-50);
+  --main-100: var(--color-blue-100);
+  --main-200: var(--color-blue-200);
+  --main-300: var(--color-blue-300);
+  --main-400: var(--color-blue-400);
+  --main-500: var(--color-blue-500);
+  --main-600: var(--color-blue-600);
+  --main-700: var(--color-blue-700);
+  --main-800: var(--color-blue-800);
+  --main-900: var(--color-blue-900);
+  --main-950: var(--color-blue-950);
 
   --primary-50: var(--color-sky-50);
   --primary-100: var(--color-sky-100);
@@ -40,17 +40,17 @@
   --secondary-900: var(--color-gray-900);
   --secondary-950: var(--color-gray-950);
 
-  --accent-50: var(--color-amber-50);
-  --accent-100: var(--color-amber-100);
-  --accent-200: var(--color-amber-200);
-  --accent-300: var(--color-amber-300);
-  --accent-400: var(--color-amber-400);
-  --accent-500: var(--color-amber-500);
-  --accent-600: var(--color-amber-600);
-  --accent-700: var(--color-amber-700);
-  --accent-800: var(--color-amber-800);
-  --accent-900: var(--color-amber-900);
-  --accent-950: var(--color-amber-950);
+  --accent-50: var(--color-cyan-50);
+  --accent-100: var(--color-cyan-100);
+  --accent-200: var(--color-cyan-200);
+  --accent-300: var(--color-cyan-300);
+  --accent-400: var(--color-cyan-400);
+  --accent-500: var(--color-cyan-500);
+  --accent-600: var(--color-cyan-600);
+  --accent-700: var(--color-cyan-700);
+  --accent-800: var(--color-cyan-800);
+  --accent-900: var(--color-cyan-900);
+  --accent-950: var(--color-cyan-950);
 
   --warning-50: var(--color-orange-50);
   --warning-100: var(--color-orange-100);
@@ -128,11 +128,11 @@
 @theme {
   /* === Base Colors (OKLCH) === */
   --color-main: var(--main-600);
-  --color-primary: var(--color-sky-500);
-  --color-accent: var(--color-amber-500);
+  --color-primary: var(--color-blue-500);
+  --color-accent: var(--color-cyan-500);
   --color-secondary: var(--color-gray-500);
 
-  /* === Main Base (slate) === */
+  /* === Main Base (logo blue) === */
   --color-main-50: var(--main-50);
   --color-main-100: var(--main-100);
   --color-main-200: var(--main-200);
@@ -145,7 +145,7 @@
   --color-main-900: var(--main-900);
   --color-main-950: var(--main-950);
 
-  /* === Primary (sky) === */
+  /* === Primary (bright sky blue) === */
   --color-primary-50: var(--primary-50);
   --color-primary-100: var(--primary-100);
   --color-primary-200: var(--primary-200);
@@ -171,18 +171,18 @@
   --color-secondary-900: var(--color-gray-900);
   --color-secondary-950: var(--color-gray-950);
 
-  /* === Accent (Amber) === */
-  --color-accent-50: var(--color-amber-50);
-  --color-accent-100: var(--color-amber-100);
-  --color-accent-200: var(--color-amber-200);
-  --color-accent-300: var(--color-amber-300);
-  --color-accent-400: var(--color-amber-400);
-  --color-accent-500: var(--color-amber-500);
-  --color-accent-600: var(--color-amber-600);
-  --color-accent-700: var(--color-amber-700);
-  --color-accent-800: var(--color-amber-800);
-  --color-accent-900: var(--color-amber-900);
-  --color-accent-950: var(--color-amber-950);
+  /* === Accent (soft cyan) === */
+  --color-accent-50: var(--color-cyan-50);
+  --color-accent-100: var(--color-cyan-100);
+  --color-accent-200: var(--color-cyan-200);
+  --color-accent-300: var(--color-cyan-300);
+  --color-accent-400: var(--color-cyan-400);
+  --color-accent-500: var(--color-cyan-500);
+  --color-accent-600: var(--color-cyan-600);
+  --color-accent-700: var(--color-cyan-700);
+  --color-accent-800: var(--color-cyan-800);
+  --color-accent-900: var(--color-cyan-900);
+  --color-accent-950: var(--color-cyan-950);
 
   /* === Status Colors === */
   --color-success: var(--color-green-500);
@@ -286,4 +286,230 @@
   /* === Additional Colors === */
   --color-dark: var(--color-main-900);
   --color-light: var(--color-main-50);
+}
+
+@keyframes navbar-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes navbar-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes home-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes home-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes home-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes about-border-shift {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes about-badge-shimmer {
+  0% {
+    transform: translateX(-130%);
+  }
+
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+.navbar-enter {
+  animation: navbar-slide-down 0.55s ease-out;
+}
+
+.navbar-menu-enter {
+  transform-origin: top right;
+  animation: navbar-fade-up 0.2s ease-out;
+}
+
+.home-reveal {
+  opacity: 0;
+  animation: home-fade-up 0.8s ease-out forwards;
+}
+
+.home-reveal-delay-1 {
+  animation-delay: 0.12s;
+}
+
+.home-reveal-delay-2 {
+  animation-delay: 0.24s;
+}
+
+.home-reveal-delay-3 {
+  animation-delay: 0.36s;
+}
+
+.home-reveal-delay-4 {
+  animation-delay: 0.48s;
+}
+
+.home-image-float {
+  animation: home-float 5.5s ease-in-out infinite;
+}
+
+.home-glow-pulse {
+  animation: home-glow 5.5s ease-in-out infinite;
+}
+
+.about-reveal {
+  opacity: 0;
+  animation: home-fade-up 0.85s ease-out forwards;
+}
+
+.about-reveal-delay-1 {
+  animation-delay: 0.14s;
+}
+
+.about-reveal-delay-2 {
+  animation-delay: 0.28s;
+}
+
+.about-reveal-delay-3 {
+  animation-delay: 0.42s;
+}
+
+.about-image-float {
+  animation: home-float 6s ease-in-out infinite;
+}
+
+.about-glow-pulse {
+  animation: home-glow 6s ease-in-out infinite;
+}
+
+.about-card-border {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2rem;
+  padding: 2px;
+  box-shadow: 0 24px 70px rgba(37, 99, 235, 0.12);
+}
+
+.about-card-border::before {
+  content: "";
+  position: absolute;
+  inset: -140%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(56, 189, 248, 0.15),
+    rgba(59, 130, 246, 0.95),
+    rgba(186, 230, 253, 0.45),
+    rgba(37, 99, 235, 0.95),
+    rgba(56, 189, 248, 0.15)
+  );
+  animation: about-border-shift 4.5s linear infinite;
+}
+
+.about-card-surface {
+  position: relative;
+  z-index: 1;
+  border-radius: calc(2rem - 1px);
+}
+
+.auth-card-border {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  padding: 2px;
+  box-shadow: 0 20px 60px rgba(37, 99, 235, 0.12);
+}
+
+.auth-card-border::before {
+  content: "";
+  position: absolute;
+  inset: -140%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(56, 189, 248, 0.12),
+    rgba(59, 130, 246, 0.9),
+    rgba(191, 219, 254, 0.4),
+    rgba(37, 99, 235, 0.9),
+    rgba(56, 189, 248, 0.12)
+  );
+  animation: about-border-shift 5s linear infinite;
+}
+
+.auth-card-surface {
+  position: relative;
+  z-index: 1;
+  border-radius: calc(1.5rem - 1px);
+}
+
+.about-badge {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.about-badge:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 14px 28px rgba(59, 130, 246, 0.18);
+  background-color: color-mix(in oklab, var(--color-main-100) 70%, white 30%);
+}
+
+.about-badge::after {
+  content: "";
+  position: absolute;
+  inset: -20% auto -20% -30%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: translateX(-130%);
+}
+
+.about-badge:hover::after {
+  animation: about-badge-shimmer 0.8s ease;
 }

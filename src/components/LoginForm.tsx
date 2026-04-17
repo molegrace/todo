@@ -2,32 +2,35 @@ import { Link } from "react-router-dom";
 import Button from "./Button";
 import Input from "./Input";
 
-
 const LoginForm: React.FC = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-200">
-      <div className="bg-main-50 shadow-lg rounded-2xl p-8 w-80 border border-main-200">
-        <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-main-50 via-white to-primary-100">
+      <div className="auth-card-border w-80">
+        <div className="auth-card-surface bg-white p-8">
+          <h2 className="mb-6 text-center text-2xl font-bold text-main-700">
+            Login
+          </h2>
 
-        <div className="space-y-4">
-          <Input placeholder="Username" className="w-full" ></Input>
-          <Input placeholder="Password" type="password" className="w-full" />
+          <div className="space-y-4">
+            <Input placeholder="Username" className="w-full" />
+            <Input placeholder="Password" type="password" className="w-full" />
+          </div>
+
+          <Button
+            label="Login"
+            className="mt-6 w-full bg-main-400 text-white hover:bg-main-500"
+          />
+
+          <p className="mt-4 text-center text-sm text-main-600">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="font-medium text-main-600 hover:underline"
+            >
+              Register
+            </Link>
+          </p>
         </div>
-
-        <Button
-          label="Login"
-          className="bg-main-400 hover:bg-main-500 text-white w-full mt-6"
-        ></Button>
-
-        <p className="text-center text-sm mt-4">
-          Don’t have an account?{" "}
-          <Link
-            to="/register"
-            className="text-main-600 hover:underline font-medium"
-          >
-            Register
-          </Link>
-        </p>
       </div>
     </div>
   );
