@@ -25,7 +25,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const navItems = [
     { label: "Overview", href: "/dashboard", count: totalTasks },
     { label: "Tasks", href: "/dashboard/tasks", count: pendingTasks },
-    { label: "Lists", href: "/dashboard/lists", count: categories.length },
+    { label: "Cartegories", href: "/dashboard/lists", count: categories.length },
   ];
 
   return (
