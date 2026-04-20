@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/todo2.png";
 
 type NavbarProps = {
@@ -9,6 +9,20 @@ type NavbarProps = {
 const Navbar: React.FC<NavbarProps> = ({ title }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const isDashboardRoute = location.pathname.startsWith("/dashboard");
+
+  const menuItems = [
+    { label: "Home", to: "/" },
+    { label: "About", to: "/about" },
+    { label: "Contact", to: "/contact" },
+    ...(isDashboardRoute
+      ? [{ label: "Logout", to: "/login" }]
+      : [
+          { label: "Login", to: "/login" },
+          { label: "Sign Up", to: "/register" },
+        ]),
+  ].filter((item) => item.to !== location.pathname);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,41 +81,16 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
 
         {isMenuOpen && (
           <div className="navbar-menu-enter absolute right-0 top-14 z-20 flex w-48 flex-col rounded-2xl border border-main-200 bg-white p-2 shadow-xl">
-            <Link
-              to="/"
-              onClick={handleMenuClose}
-              className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
-            >
-              Home
-            </Link>
-            <Link
-              to="/about"
-              onClick={handleMenuClose}
-              className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
-            >
-              About
-            </Link>
-            <Link
-              to="/contact"
-              onClick={handleMenuClose}
-              className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
-            >
-              Contact
-            </Link>
-            <Link
-              to="/login"
-              onClick={handleMenuClose}
-              className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              onClick={handleMenuClose}
-              className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
-            >
-              Sign Up
-            </Link>
+            {menuItems.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={handleMenuClose}
+                className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
         )}
       </div>

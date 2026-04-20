@@ -13,26 +13,23 @@ import { DashboardProvider } from "./context/DashboardContext";
 
 function App() {
   return (
-<>
-<Navbar title="Todo App" />
-    <DashboardProvider>
-    <Routes>
-    <Route path="/" element={<Homepage/>} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/dashboard/tasks" element={<TasksPage />} />
-      <Route path="/dashboard/lists" element={<ListsPage />} />
-      <Route path="/login" element={<LoginForm />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/test" element={<TestPage />} />
-      <Route path="/contact" element={<ContactUs/>} />
-      <Route path="/about" element={<AboutPage/>} />
-    </Routes>
-    </DashboardProvider>
- </>
+    <>
+      <Navbar title="Todo App" />
+      <DashboardProvider>
+        <Routes>
+          <Route path="/" element={<Homepage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard/tasks" element={<TasksPage />} />
+          <Route path="/dashboard/lists" element={<ListsPage />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/test" element={<TestPage />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/about" element={<AboutPage />} />
+        </Routes>
+      </DashboardProvider>
+    </>
   );
- 
-
-  
 }
 
 export default App;
