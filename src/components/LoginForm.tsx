@@ -22,6 +22,13 @@ const LoginForm: React.FC = () => {
           />
 
           <p className="mt-4 text-center text-sm text-main-600">
+            <Link
+              to="/dashboard"
+              className="mr-3 font-medium text-main-600 hover:underline"
+            >
+              Home
+            </Link>
+            <span className="text-main-300">|</span>{" "}
             Don't have an account?{" "}
             <Link
               to="/register"

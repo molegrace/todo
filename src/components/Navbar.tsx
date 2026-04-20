@@ -75,27 +75,6 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
               Home
             </Link>
             <Link
-              to="/dashboard"
-              onClick={handleMenuClose}
-              className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
-            >
-              Overview
-            </Link>
-            <Link
-              to="/dashboard/tasks"
-              onClick={handleMenuClose}
-              className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
-            >
-              Tasks
-            </Link>
-            <Link
-              to="/dashboard/lists"
-              onClick={handleMenuClose}
-              className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
-            >
-              Lists
-            </Link>
-            <Link
               to="/about"
               onClick={handleMenuClose}
               className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
