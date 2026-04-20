@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Checkbox from "../components/Checkbox";
@@ -11,10 +11,25 @@ import {
 } from "../context/DashboardContext";
 
 const ListsPage: React.FC = () => {
-  const { categories, tasks, addCategory, toggleTaskStatus } = useDashboard();
+  const {
+    categories,
+    tasks,
+    addCategory,
+    renameCategory,
+    deleteCategory,
+    toggleTaskStatus,
+  } = useDashboard();
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(categories[0] ?? "Work");
+  const [isManageCategoryModalOpen, setIsManageCategoryModalOpen] = useState(false);
+  const [categoryDraft, setCategoryDraft] = useState("");
+
+  useEffect(() => {
+    if (!categories.includes(selectedCategory)) {
+      setSelectedCategory(categories[0] ?? "Work");
+    }
+  }, [categories, selectedCategory]);
 
   const categoryCards = useMemo(
     () =>
@@ -49,6 +64,31 @@ const ListsPage: React.FC = () => {
     setIsCategoryModalOpen(false);
   };
 
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(category);
+    setCategoryDraft(category);
+    setIsManageCategoryModalOpen(true);
+  };
+
+  const handleUpdateCategory = () => {
+    const updated = renameCategory(selectedCategory, categoryDraft);
+    if (!updated) return;
+
+    setSelectedCategory(categoryDraft.trim());
+    setIsManageCategoryModalOpen(false);
+  };
+
+  const handleDeleteCategory = () => {
+    const nextSelectedCategory =
+      categories.find((category) => category !== selectedCategory) ?? "Work";
+
+    const deleted = deleteCategory(selectedCategory);
+    if (!deleted) return;
+
+    setSelectedCategory(nextSelectedCategory);
+    setIsManageCategoryModalOpen(false);
+  };
+
   return (
     <>
       <DashboardLayout
@@ -66,10 +106,10 @@ const ListsPage: React.FC = () => {
             <button
               key={category.label}
               type="button"
-              onClick={() => setSelectedCategory(category.label)}
+              onClick={() => handleCategoryClick(category.label)}
               className={`rounded-[2rem] border p-5 text-left shadow-sm transition ${
                 selectedCategory === category.label
-                  ? "border-main-200 bg-white text-main-700 shadow-lg"
+                  ? "border-main-400 bg-white text-main-700 shadow-lg ring-2 ring-main-200"
                   : "border-main-200 bg-white hover:-translate-y-1 hover:shadow-lg"
               }`}
             >
@@ -215,6 +255,44 @@ const ListsPage: React.FC = () => {
               onClick={() => setIsCategoryModalOpen(false)}
             />
             <Button label="Save category" onClick={handleAddCategory} />
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isManageCategoryModalOpen}
+        onClose={() => setIsManageCategoryModalOpen(false)}
+      >
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-semibold text-main-700">
+              Manage category
+            </h2>
+            <p className="text-sm text-main-500">
+              Edit the category name or remove it from your lists.
+            </p>
+          </div>
+
+          <Input
+            label="Category name"
+            value={categoryDraft}
+            onChange={(e) => setCategoryDraft(e.target.value)}
+            className="w-full"
+          />
+
+          <div className="flex flex-wrap justify-end gap-3">
+            <Button
+              label="Delete"
+              variant="danger"
+              onClick={handleDeleteCategory}
+              disabled={categories.length <= 1}
+            />
+            <Button
+              label="Cancel"
+              variant="secondary"
+              onClick={() => setIsManageCategoryModalOpen(false)}
+            />
+            <Button label="Save changes" onClick={handleUpdateCategory} />
           </div>
         </div>
       </Modal>

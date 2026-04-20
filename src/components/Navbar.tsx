@@ -57,7 +57,7 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
           />
         </div>
         <div>
-          <h1 className="text-lg font-bold tracking-tight text-main-700">
+          <h1 className="text-lg font-bold tracking-tight text-blue-700">
             {title}
           </h1>
           <p className="text-xs text-main-500">Organize your day with ease</p>

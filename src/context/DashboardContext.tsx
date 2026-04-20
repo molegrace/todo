@@ -36,6 +36,8 @@ type DashboardContextValue = {
   addTask: (task: TaskDraft) => void;
   quickAddTask: (title: string, selectedCategory?: string) => boolean;
   addCategory: (category: string) => boolean;
+  renameCategory: (currentCategory: string, nextCategory: string) => boolean;
+  deleteCategory: (category: string) => boolean;
   toggleTaskStatus: (taskId: number) => void;
 };
 
@@ -239,6 +241,54 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     return true;
   };
 
+  const renameCategory = (currentCategory: string, nextCategory: string) => {
+    const trimmedNextCategory = nextCategory.trim();
+
+    if (
+      !trimmedNextCategory ||
+      !categories.includes(currentCategory) ||
+      (trimmedNextCategory !== currentCategory &&
+        categories.includes(trimmedNextCategory))
+    ) {
+      return false;
+    }
+
+    if (trimmedNextCategory === currentCategory) return true;
+
+    setCategories((prev) =>
+      prev.map((category) =>
+        category === currentCategory ? trimmedNextCategory : category
+      )
+    );
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.category === currentCategory
+          ? { ...task, category: trimmedNextCategory }
+          : task
+      )
+    );
+    setBanner("Category updated.");
+    return true;
+  };
+
+  const deleteCategory = (category: string) => {
+    if (!categories.includes(category) || categories.length <= 1) return false;
+
+    const fallbackCategory =
+      categories.find((item) => item !== category) ?? initialCategories[0];
+
+    setCategories((prev) => prev.filter((item) => item !== category));
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.category === category
+          ? { ...task, category: fallbackCategory }
+          : task
+      )
+    );
+    setBanner("Category deleted.");
+    return true;
+  };
+
   const toggleTaskStatus = (taskId: number) => {
     setTasks((prev) =>
       prev.map((task) =>
@@ -266,6 +316,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
         addTask,
         quickAddTask,
         addCategory,
+        renameCategory,
+        deleteCategory,
         toggleTaskStatus,
       }}
     >
