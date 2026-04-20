@@ -32,18 +32,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_rgba(186,230,253,0.4),_transparent_35%),linear-gradient(to_bottom_right,_var(--color-blue-50),_white,_var(--color-sky-100))] px-4 py-6 sm:px-6">
       <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[280px_1fr]">
         <aside className="space-y-5">
-          <div className="rounded-[2rem] border border-main-200 bg-white/95 p-5 shadow-sm backdrop-blur-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-main-500">
-              Workspace
-            </p>
-            <h2 className="mt-3 text-2xl font-bold text-main-700">
-              Stay in control
-            </h2>
-            <p className="mt-2 text-sm leading-7 text-main-500">
-              Move through your tasks one clear step at a time instead of handling everything in one crowded screen.
-            </p>
-          </div>
-
           <div className="rounded-[2rem] border border-main-200 bg-white/95 p-4 shadow-sm backdrop-blur-sm">
             <p className="px-3 text-xs font-semibold uppercase tracking-[0.24em] text-main-500">
               Dashboard
@@ -77,18 +65,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </div>
 
           {showSnapshot && (
-            <div className="rounded-[2rem] border border-main-300 bg-gradient-to-br from-main-800 via-main-700 to-main-600 p-5 text-white shadow-lg">
-              <p className="text-xs uppercase tracking-[0.24em] text-white/75">
+            <div className="rounded-[2rem] border border-main-300 bg-main-100 p-5 text-main-600 shadow-lg">
+              <p className="text-xs uppercase tracking-[0.24em] text-main-500">
                 Snapshot
               </p>
               <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-white/15 bg-white/16 px-3 py-3 shadow-md shadow-black/10 backdrop-blur-md">
-                  <p className="text-xs text-white/75">Completed</p>
-                  <p className="mt-2 text-3xl font-bold text-white">{completedTasks}</p>
+                <div className="rounded-2xl border border-main-200 bg-white px-3 py-3 shadow-md shadow-main-200/60">
+                  <p className="text-xs text-main-500">Completed</p>
+                  <p className="mt-2 text-3xl font-bold text-main-700">{completedTasks}</p>
                 </div>
-                <div className="rounded-2xl border border-white/15 bg-white/16 px-3 py-3 shadow-md shadow-black/10 backdrop-blur-md">
-                  <p className="text-xs text-white/75">Pending</p>
-                  <p className="mt-2 text-3xl font-bold text-white">{pendingTasks}</p>
+                <div className="rounded-2xl border border-main-200 bg-white px-3 py-3 shadow-md shadow-main-200/60">
+                  <p className="text-xs text-main-500">Pending</p>
+                  <p className="mt-2 text-3xl font-bold text-main-700">{pendingTasks}</p>
                 </div>
               </div>
             </div>

@@ -69,23 +69,23 @@ const ListsPage: React.FC = () => {
               onClick={() => setSelectedCategory(category.label)}
               className={`rounded-[2rem] border p-5 text-left shadow-sm transition ${
                 selectedCategory === category.label
-                  ? "border-main-500 bg-main-700 text-white shadow-lg"
+                  ? "border-main-200 bg-white text-main-700 shadow-lg"
                   : "border-main-200 bg-white hover:-translate-y-1 hover:shadow-lg"
               }`}
             >
               <p
                 className={`text-xs font-semibold uppercase tracking-[0.24em] ${
-                  selectedCategory === category.label ? "text-white/60" : "text-main-500"
+                  selectedCategory === category.label ? "text-main-500" : "text-main-500"
                 }`}
               >
                 List
               </p>
-              <h3 className="mt-3 text-2xl font-bold">{category.label}</h3>
+              <h3 className="mt-3 text-2xl font-bold text-black">{category.label}</h3>
               <div className="mt-5 grid grid-cols-3 gap-3">
                 <div
                   className={`rounded-2xl px-3 py-3 ${
                     selectedCategory === category.label
-                      ? "bg-white/10"
+                      ? "bg-white"
                       : "bg-main-50"
                   }`}
                 >
@@ -95,7 +95,7 @@ const ListsPage: React.FC = () => {
                 <div
                   className={`rounded-2xl px-3 py-3 ${
                     selectedCategory === category.label
-                      ? "bg-white/10"
+                      ? "bg-white"
                       : "bg-main-50"
                   }`}
                 >
@@ -105,7 +105,7 @@ const ListsPage: React.FC = () => {
                 <div
                   className={`rounded-2xl px-3 py-3 ${
                     selectedCategory === category.label
-                      ? "bg-white/10"
+                      ? "bg-white"
                       : "bg-main-50"
                   }`}
                 >

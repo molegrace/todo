@@ -28,33 +28,32 @@ const DashboardPage: React.FC = () => {
       showHeaderCard={false}
       showSnapshot={false}
     >
-      <section className="overflow-hidden rounded-[2rem] border border-main-200 bg-gradient-to-r from-main-500 via-main-600 to-main-600 p-6 text-white shadow-xl sm:p-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+      <section className="overflow-hidden rounded-[2rem] border border-main-300 bg-main-100 p-6 text-main-600 shadow-xl sm:p-8">
+        <div className="space-y-6">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-6">
+            <p className="pt-2 text-xs uppercase tracking-[0.3em] text-main-500">
               {getGreeting()}
             </p>
-            <h1 className="mt-3 text-3xl font-bold sm:text-5xl">
+            <h1 className="whitespace-nowrap text-3xl font-bold text-main-700 sm:text-5xl">
               Your day at a glance
             </h1>
-            
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { label: "Total", value: totalTasks },
-              { label: "Done", value: completedTasks },
-              { label: "Pending", value: pendingTasks },
-              { label: "High priority", value: highPriorityOpen },
+              { label: "Total Tasks", value: totalTasks },
+              { label: "Done Tasks", value: completedTasks },
+              { label: "Pending Tasks", value: pendingTasks },
+              { label: "High priority Tasks", value: highPriorityOpen },
             ].map((item) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-white/20 bg-white/18 px-4 py-4 shadow-lg shadow-black/10 backdrop-blur-md"
+                className="rounded-2xl border border-main-200 bg-white px-4 py-4 shadow-lg shadow-main-200/60"
               >
-                <p className="text-xs uppercase tracking-[0.18em] text-white/80">
+                <p className="text-xs uppercase tracking-[0.18em] text-main-500">
                   {item.label}
                 </p>
-                <p className="mt-2 text-3xl font-bold text-white">{item.value}</p>
+                <p className="mt-2 text-3xl font-bold text-main-700">{item.value}</p>
               </div>
             ))}
           </div>
