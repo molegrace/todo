@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import Alert from "./Alert";
 import { useDashboard } from "../context/DashboardContext";
 
 type DashboardLayoutProps = {
@@ -20,7 +21,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   showSnapshot = true,
 }) => {
   const location = useLocation();
-  const { totalTasks, pendingTasks, completedTasks, categories } = useDashboard();
+  const { totalTasks, pendingTasks, completedTasks, categories, banner, setBanner } =
+    useDashboard();
 
   const navItems = [
     { label: "Overview", href: "/dashboard", count: totalTasks },
@@ -97,6 +99,22 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 </div>
                 {actions && <div className="flex flex-wrap gap-3">{actions}</div>}
               </div>
+            </div>
+          )}
+
+          {banner && (
+            <div className="flex items-start justify-between gap-3 rounded-2xl">
+              <div className="flex-1">
+                <Alert message={banner.message} type={banner.type} />
+              </div>
+              <button
+                type="button"
+                onClick={() => setBanner(null)}
+                className="rounded-xl border border-main-200 bg-white px-3 py-2 text-sm font-medium text-main-600 shadow-sm transition hover:bg-main-50 hover:text-main-700"
+                aria-label="Dismiss message"
+              >
+                Close
+              </button>
             </div>
           )}
 

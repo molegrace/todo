@@ -35,8 +35,10 @@ type DashboardContextValue = {
   tasks: Task[];
   categories: string[];
   today: string;
-  banner: string | null;
-  setBanner: React.Dispatch<React.SetStateAction<string | null>>;
+  banner: { type: "success" | "error"; message: string } | null;
+  setBanner: React.Dispatch<
+    React.SetStateAction<{ type: "success" | "error"; message: string } | null>
+  >;
   totalTasks: number;
   completedTasks: number;
   pendingTasks: number;
@@ -81,7 +83,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [categories, setCategories] = useState<string[]>(defaultCategories);
-  const [banner, setBanner] = useState<string | null>(null);
+  const [banner, setBanner] = useState<
+    { type: "success" | "error"; message: string } | null
+  >(null);
   const today = getToday();
 
   useEffect(() => {
@@ -94,7 +98,10 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     let isMounted = true;
     void ensureDashboardMeta(user.uid, defaultCategories).catch(() => {
       if (!isMounted) return;
-      setBanner("Failed to load dashboard settings.");
+      setBanner({
+        type: "error",
+        message: "Failed to load dashboard settings.",
+      });
     });
 
     const unsubscribeCategories = subscribeDashboardCategories(user.uid, (next) => {
@@ -110,6 +117,12 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       unsubscribeTasks();
     };
   }, [user]);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    if (!user) return;
+    console.log(`[dashboard] tasks for uid=${user.uid}`, tasks);
+  }, [tasks, user]);
 
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((task) => task.completed).length;
@@ -153,7 +166,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       },
       ...prev,
     ]);
-    setBanner("New task created.");
+    setBanner({ type: "success", message: "New task created." });
 
     void setUserTask(user.uid, taskId, {
       title,
@@ -162,8 +175,10 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       completed: false,
       category: task.category,
       createdAt: today,
-    }).catch(() => {
-      setBanner("Failed to save task. Please try again.");
+    }).catch((error) => {
+      if (import.meta.env.DEV) console.error("Failed to save task:", error);
+      setTasks((prev) => prev.filter((item) => item.id !== taskId));
+      setBanner({ type: "error", message: "Failed to save task. Please try again." });
     });
   };
 
@@ -190,7 +205,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       },
       ...prev,
     ]);
-    setBanner("Task added successfully.");
+    setBanner({ type: "success", message: "Task added successfully." });
 
     void setUserTask(user.uid, taskId, {
       title: trimmedTitle,
@@ -199,8 +214,10 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       completed: false,
       category: defaultCategory,
       createdAt: today,
-    }).catch(() => {
-      setBanner("Failed to save task. Please try again.");
+    }).catch((error) => {
+      if (import.meta.env.DEV) console.error("Failed to quick-save task:", error);
+      setTasks((prev) => prev.filter((item) => item.id !== taskId));
+      setBanner({ type: "error", message: "Failed to save task. Please try again." });
     });
     return true;
   };
@@ -215,11 +232,11 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     setCategories((prev) => {
       const next = [...prev, value];
       void setDashboardCategories(user.uid, next).catch(() => {
-        setBanner("Failed to save category. Please try again.");
+        setBanner({ type: "error", message: "Failed to save category. Please try again." });
       });
       return next;
     });
-    setBanner("Category created.");
+    setBanner({ type: "success", message: "Category created." });
     return true;
   };
 
@@ -248,7 +265,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
           bulkMoveTasksToCategory(user.uid, currentCategory, trimmedNextCategory)
         )
         .catch(() => {
-          setBanner("Failed to update category. Please try again.");
+          setBanner({ type: "error", message: "Failed to update category. Please try again." });
         });
       return next;
     });
@@ -259,7 +276,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
           : task
       )
     );
-    setBanner("Category updated.");
+    setBanner({ type: "success", message: "Category updated." });
     return true;
   };
 
@@ -276,7 +293,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       void setDashboardCategories(user.uid, next)
         .then(() => bulkMoveTasksToCategory(user.uid, category, fallbackCategory))
         .catch(() => {
-          setBanner("Failed to delete category. Please try again.");
+          setBanner({ type: "error", message: "Failed to delete category. Please try again." });
         });
       return next;
     });
@@ -287,7 +304,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
           : task
       )
     );
-    setBanner("Category deleted.");
+    setBanner({ type: "success", message: "Category deleted." });
     return true;
   };
 
@@ -301,7 +318,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       const nextCompleted = !current.completed;
       void updateUserTask(user.uid, taskId, { completed: nextCompleted }).catch(
         () => {
-          setBanner("Failed to update task. Please try again.");
+          setBanner({ type: "error", message: "Failed to update task. Please try again." });
         }
       );
 
@@ -335,7 +352,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
         category: nextTask.category,
         createdAt: nextTask.createdAt,
       }).catch(() => {
-        setBanner("Failed to update task. Please try again.");
+        setBanner({ type: "error", message: "Failed to update task. Please try again." });
       });
 
       return prev.map((task) => (task.id === taskId ? nextTask : task));
@@ -348,10 +365,10 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user) return;
 
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    setBanner("Task deleted.");
+    setBanner({ type: "success", message: "Task deleted." });
 
     void deleteUserTask(user.uid, taskId).catch(() => {
-      setBanner("Failed to delete task. Please try again.");
+      setBanner({ type: "error", message: "Failed to delete task. Please try again." });
     });
   };
 

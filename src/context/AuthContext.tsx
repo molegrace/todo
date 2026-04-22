@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../firebase";
+import { ensureUserProfileDoc } from "../api/firestoreUsersApi";
 
 type AuthContextValue = {
   user: User | null;
@@ -17,6 +18,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
       setUser(nextUser);
       setInitializing(false);
+
+      if (nextUser) {
+        void ensureUserProfileDoc(nextUser).catch((error) => {
+          if (import.meta.env.DEV) {
+            console.error("Failed to ensure user profile doc:", error);
+          }
+        });
+      }
     });
 
     return unsubscribe;

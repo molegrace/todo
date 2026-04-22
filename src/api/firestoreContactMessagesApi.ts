@@ -21,6 +21,10 @@ export type ContactMessageDoc = {
 export const createContactMessage = async (
   input: ContactMessageInput
 ): Promise<string> => {
+  if (!input.uid) {
+    throw new Error("auth/required");
+  }
+
   const docToCreate: ContactMessageDoc = {
     name: input.name.trim(),
     email: input.email.trim(),
@@ -30,15 +34,22 @@ export const createContactMessage = async (
     status: "new",
   };
 
-  const docRef = await addDoc(collection(db, "contactMessages"), docToCreate);
+  const docRef = await addDoc(
+    collection(db, "users", input.uid, "contactMessages"),
+    docToCreate
+  );
   return docRef.id;
 };
 
 export const getContactMessageErrorMessage = (error: unknown): string => {
+  if (error instanceof Error && error.message === "auth/required") {
+    return "Please log in to send a message.";
+  }
+
   if (error instanceof FirebaseError) {
     switch (error.code) {
       case "permission-denied":
-        return "Contact form is not configured yet (permission denied). Ask the admin to update Firestore rules.";
+        return "Permission denied. Ask the admin to update Firestore rules for contact messages.";
       case "unavailable":
       case "auth/network-request-failed":
         return "Network error. Check your connection and try again.";

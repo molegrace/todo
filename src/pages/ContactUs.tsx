@@ -8,9 +8,11 @@ import {
   createContactMessage,
   getContactMessageErrorMessage,
 } from "../api/firestoreContactMessagesApi";
+import { Link, useNavigate } from "react-router-dom";
 
 const Contact: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -31,6 +33,7 @@ const Contact: React.FC = () => {
   };
 
   const validationError = useMemo(() => {
+    if (!user) return "Please log in to send a message.";
     if (!form.name.trim()) return "Please enter your name.";
     if (!form.email.trim()) return "Please enter your email.";
     if (!form.email.includes("@")) return "Please enter a valid email.";
@@ -47,6 +50,7 @@ const Contact: React.FC = () => {
 
     if (validationError) {
       setStatus({ type: "error", message: validationError });
+      if (!user) navigate("/login");
       return;
     }
 
@@ -81,6 +85,12 @@ const Contact: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {status && <Alert message={status.message} type={status.type} />}
+            {!user && !status && (
+              <Alert
+                type="error"
+                message="You must be logged in to send a message. Please log in, then come back to Contact Us."
+              />
+            )}
 
             <Input
               type="text"
@@ -89,7 +99,7 @@ const Contact: React.FC = () => {
               className="w-full"
               value={form.name}
               onChange={handleChange}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !user}
               required
             />
             <Input
@@ -99,7 +109,7 @@ const Contact: React.FC = () => {
               className="w-full"
               value={form.email}
               onChange={handleChange}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !user}
               required
             />
 
@@ -109,7 +119,7 @@ const Contact: React.FC = () => {
               rows={4}
               value={form.message}
               onChange={handleChange}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !user}
               className="rounded-lg border border-main-300 px-4 py-2 text-main-700 outline-none focus:ring-2 focus:ring-main-400"
               required
             />
@@ -118,8 +128,16 @@ const Contact: React.FC = () => {
               type="submit"
               label={isSubmitting ? "Sending..." : "Send Message"}
               className="rounded-lg bg-main-400 py-2 text-white transition hover:bg-main-500 disabled:cursor-not-allowed disabled:opacity-70"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !user}
             />
+
+            {!user && (
+              <p className="text-center text-sm text-main-600">
+                <Link to="/login" className="font-medium text-main-600 hover:underline">
+                  Go to login
+                </Link>
+              </p>
+            )}
           </form>
         </div>
       </div>
