@@ -26,7 +26,6 @@ const DashboardPage: React.FC = () => {
       title="Dashboard Overview"
       description="A clear summary of what matters today."
       showHeaderCard={false}
-      showSnapshot={false}
     >
       <section className="overflow-hidden rounded-[2rem] border border-main-200 bg-white p-6 text-main-600 shadow-xl sm:p-8">
         <div className="space-y-6">

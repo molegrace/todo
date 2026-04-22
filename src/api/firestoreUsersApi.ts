@@ -34,3 +34,20 @@ export const ensureUserProfileDoc = async (user: User): Promise<void> => {
   await setDoc(ref, initial, { merge: true });
 };
 
+export const updateUserProfileDoc = async (
+  user: User,
+  updates: Partial<Pick<UserProfileDoc, "displayName" | "email">>
+): Promise<void> => {
+  const ref = doc(db, "users", user.uid);
+  const now = new Date().toISOString();
+
+  await setDoc(
+    ref,
+    {
+      uid: user.uid,
+      updatedAt: now,
+      ...updates,
+    } satisfies Partial<UserProfileDoc>,
+    { merge: true }
+  );
+};
