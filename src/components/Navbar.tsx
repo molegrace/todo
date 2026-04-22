@@ -1,28 +1,56 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/todo2.png";
+import { getLogoutErrorMessage, logoutUser } from "../services/auth/logoutService";
+import { useAuth } from "../context/AuthContext";
 
 type NavbarProps = {
   title: string;
 };
 
 const Navbar: React.FC<NavbarProps> = ({ title }) => {
+  const navigate = useNavigate();
+  const { user, initializing } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const isDashboardRoute = location.pathname.startsWith("/dashboard");
+  const isAuthenticated = !initializing && Boolean(user);
 
-  const menuItems = [
-    { label: "Home", to: "/" },
-    { label: "About", to: "/about" },
-    { label: "Contact", to: "/contact" },
-    ...(isDashboardRoute
-      ? [{ label: "Logout", to: "/login" }]
-      : [
-          { label: "Login", to: "/login" },
-          { label: "Sign Up", to: "/register" },
-        ]),
-  ].filter((item) => item.to !== location.pathname);
+  const handleMenuClose = () => {
+    setIsMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+
+    setLogoutError(null);
+    setIsLoggingOut(true);
+    try {
+      await logoutUser();
+      handleMenuClose();
+      navigate("/login");
+    } catch (error) {
+      setLogoutError(getLogoutErrorMessage(error));
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  const menuItems = (
+    [
+      { label: "Home", to: "/" },
+      { label: "About", to: "/about" },
+      { label: "Contact", to: "/contact" },
+      ...(isAuthenticated
+        ? [{ label: "Logout", onClick: handleLogout }]
+        : [
+            { label: "Login", to: "/login" },
+            { label: "Sign Up", to: "/register" },
+          ]),
+    ] as const
+  ).filter((item) => !("to" in item) || item.to !== location.pathname);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -40,10 +68,6 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
 
   const handleMenuToggle = () => {
     setIsMenuOpen((prev) => !prev);
-  };
-
-  const handleMenuClose = () => {
-    setIsMenuOpen(false);
   };
 
   return (
@@ -81,16 +105,33 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
 
         {isMenuOpen && (
           <div className="navbar-menu-enter absolute right-0 top-14 z-20 flex w-48 flex-col rounded-2xl border border-main-200 bg-white p-2 shadow-xl">
-            {menuItems.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={handleMenuClose}
-                className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {logoutError && (
+              <div className="px-3 py-2 text-xs text-red-700" role="alert">
+                {logoutError}
+              </div>
+            )}
+            {menuItems.map((item) =>
+              "to" in item ? (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={handleMenuClose}
+                  className="rounded-xl px-3 py-2 text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={item.onClick}
+                  disabled={isLoggingOut}
+                  className="rounded-xl px-3 py-2 text-left text-sm font-medium transition duration-200 hover:translate-x-1 hover:bg-main-100 hover:text-main-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isLoggingOut ? "Logging out..." : item.label}
+                </button>
+              )
+            )}
           </div>
         )}
       </div>
