@@ -1,20 +1,74 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import Alert from "../components/Alert";
+import Button from "../components/Button";
 import Input from "../components/Input";
+import Textarea from "../components/Textarea";
+import { useAuth } from "../context/AuthContext";
+import {
+  createContactMessage,
+  getContactMessageErrorMessage,
+} from "../api/firestoreContactMessagesApi";
 
 const Contact: React.FC = () => {
+  const { user } = useAuth();
   const [form, setForm] = useState({
     name: "",
     email: "",
     message: "",
   });
+  const [status, setStatus] = useState<
+    { type: "success" | "error"; message: string } | undefined
+  >(undefined);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    setForm((prev) => (prev.email ? prev : { ...prev, email: user.email ?? "" }));
+  }, [user?.email]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validationError = useMemo(() => {
+    if (!form.name.trim()) return "Please enter your name.";
+    if (!form.email.trim()) return "Please enter your email.";
+    if (!form.email.includes("@")) return "Please enter a valid email.";
+    if (!form.message.trim()) return "Please enter your message.";
+    if (form.message.trim().length < 10) return "Message should be at least 10 characters.";
+    return null;
+  }, [form.email, form.message, form.name]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(form);
+    if (isSubmitting) return;
+
+    setStatus(undefined);
+
+    if (validationError) {
+      setStatus({ type: "error", message: validationError });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await createContactMessage({
+        name: form.name,
+        email: form.email,
+        message: form.message,
+        uid: user?.uid ?? null,
+      });
+      setStatus({ type: "success", message: "Thanks! Your message was sent to the admin." });
+      setForm((prev) => ({ ...prev, message: "" }));
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        // Helpful while developing: show the actual Firebase/Firestore error in console.
+        console.error("Failed to send contact message:", error);
+      }
+      setStatus({ type: "error", message: getContactMessageErrorMessage(error) });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -26,24 +80,46 @@ const Contact: React.FC = () => {
           </h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Input type="text" name="name" placeholder="Your Name " className="w-full" required />
-            <Input type="email" name="email" placeholder="Your Email" className="w-full" required />
+            {status && <Alert message={status.message} type={status.type} />}
 
-            <textarea
+            <Input
+              type="text"
+              name="name"
+              placeholder="Your Name"
+              className="w-full"
+              value={form.name}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              required
+            />
+            <Input
+              type="email"
+              name="email"
+              placeholder="Your Email"
+              className="w-full"
+              value={form.email}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              required
+            />
+
+            <Textarea
               name="message"
               placeholder="Your Message"
               rows={4}
+              value={form.message}
               onChange={handleChange}
+              disabled={isSubmitting}
               className="rounded-lg border border-main-300 px-4 py-2 text-main-700 outline-none focus:ring-2 focus:ring-main-400"
               required
             />
 
-            <button
+            <Button
               type="submit"
-              className="rounded-lg bg-main-400 py-2 text-white transition hover:bg-main-500"
-            >
-              Send Message
-            </button>
+              label={isSubmitting ? "Sending..." : "Send Message"}
+              className="rounded-lg bg-main-400 py-2 text-white transition hover:bg-main-500 disabled:cursor-not-allowed disabled:opacity-70"
+              disabled={isSubmitting}
+            />
           </form>
         </div>
       </div>

@@ -8,6 +8,16 @@ type NavbarProps = {
   title: string;
 };
 
+type MenuLinkItem = {
+  label: string;
+  to: string;
+};
+
+type MenuActionItem = {
+  label: string;
+  onClick: () => void | Promise<void>;
+};
+
 const Navbar: React.FC<NavbarProps> = ({ title }) => {
   const navigate = useNavigate();
   const { user, initializing } = useAuth();
@@ -40,6 +50,7 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
 
   const menuItems = (
     [
+      ...(isAuthenticated ? [{ label: "Dashboard", to: "/dashboard" }] : []),
       { label: "Home", to: "/" },
       { label: "About", to: "/about" },
       { label: "Contact", to: "/contact" },
@@ -49,8 +60,14 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
             { label: "Login", to: "/login" },
             { label: "Sign Up", to: "/register" },
           ]),
-    ] as const
-  ).filter((item) => !("to" in item) || item.to !== location.pathname);
+    ] as Array<MenuLinkItem | MenuActionItem>
+  );
+
+  const visibleMenuItems = menuItems.filter((item) => {
+    if (!("to" in item)) return true;
+    if (item.to === "/dashboard") return location.pathname === "/dashboard" ? false : true;
+    return item.to !== location.pathname;
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -110,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
                 {logoutError}
               </div>
             )}
-            {menuItems.map((item) =>
+            {visibleMenuItems.map((item) =>
               "to" in item ? (
                 <Link
                   key={item.to}
