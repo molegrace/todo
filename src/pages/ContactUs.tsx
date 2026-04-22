@@ -76,7 +76,7 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-main-50 via-white to-primary-100 px-6">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-main-50 via-white to-primary-100 px-6">
       <div className="auth-card-border w-full max-w-lg">
         <div className="auth-card-surface bg-white p-8">
           <h2 className="mb-6 text-center text-3xl font-bold text-main-700">

@@ -24,10 +24,6 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ activePath }) => {
   const {
     totalTasks,
     pendingTasks,
-    completedTasks,
-    overdueTasks,
-    dueTodayTasks,
-    progressPercent,
     categories,
   } = useDashboard();
 
@@ -67,7 +63,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ activePath }) => {
 
   return (
     <div className="space-y-5">
-            <div className="rounded-[2rem] border border-main-200 bg-white/95 p-5 text-main-600 shadow-sm backdrop-blur-sm">
+            <div className="rounded-4xl border border-main-200 bg-white/95 p-5 text-main-600 shadow-sm backdrop-blur-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-main-500">
           Profile
         </p>
@@ -108,7 +104,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ activePath }) => {
         </div>
       </div>
 
-      <div className="rounded-[2rem] border border-main-200 bg-white/95 p-4 shadow-sm backdrop-blur-sm">
+      <div className="rounded-4xl border border-main-200 bg-white/95 p-4 shadow-sm backdrop-blur-sm">
         <p className="px-3 text-xs font-semibold uppercase tracking-[0.24em] text-main-500">
           Dashboard
 

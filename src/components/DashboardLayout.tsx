@@ -23,7 +23,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { banner, setBanner } = useDashboard();
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_rgba(186,230,253,0.4),_transparent_35%),linear-gradient(to_bottom_right,_var(--color-blue-50),_white,_var(--color-sky-100))] px-4 py-6 sm:px-6">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(186,230,253,0.4),transparent_35%),linear-gradient(to_bottom_right,var(--color-blue-50),white,var(--color-sky-100))] px-4 py-6 sm:px-6">
       <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[280px_1fr]">
         <aside className="space-y-5">
           <DashboardSidebar activePath={location.pathname} />
@@ -31,7 +31,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         <main className="space-y-6">
           {showHeaderCard && (
-            <div className="rounded-[2rem] border border-main-200 bg-white/90 p-6 shadow-sm backdrop-blur-sm">
+            <div className="rounded-4xl border border-main-200 bg-white/90 p-6 shadow-sm backdrop-blur-sm">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                   <h1 className="mt-2 text-3xl font-bold text-main-700 sm:text-4xl">
