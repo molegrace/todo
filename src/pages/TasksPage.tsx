@@ -30,6 +30,8 @@ const TasksPage: React.FC = () => {
     today,
     addTask,
     toggleTaskStatus,
+    updateTask,
+    deleteTask,
     pendingTasks,
     completedTasks,
     overdueTasks,
@@ -42,6 +44,7 @@ const TasksPage: React.FC = () => {
   const [sortBy, setSortBy] = useState("dueDate");
   const [currentPage, setCurrentPage] = useState(1);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [newTask, setNewTask] = useState<TaskDraft>({
     title: "",
     dueDate: today,
@@ -91,8 +94,20 @@ const TasksPage: React.FC = () => {
   }, [currentPage, totalPages]);
 
   const handleAddTask = () => {
-    addTask(newTask);
+    if (editingTaskId) {
+      const updated = updateTask(editingTaskId, {
+        title: newTask.title,
+        dueDate: newTask.dueDate,
+        priority: newTask.priority,
+        category: newTask.category,
+      });
+      if (!updated) return;
+    } else {
+      addTask(newTask);
+    }
+
     setIsTaskModalOpen(false);
+    setEditingTaskId(null);
     setNewTask({
       title: "",
       dueDate: today,
@@ -101,11 +116,36 @@ const TasksPage: React.FC = () => {
     });
   };
 
+  const openCreateTaskModal = () => {
+    setEditingTaskId(null);
+    setNewTask({
+      title: "",
+      dueDate: today,
+      priority: "Medium",
+      category: categories[0] ?? "Work",
+    });
+    setIsTaskModalOpen(true);
+  };
+
+  const openEditTaskModal = (taskId: string) => {
+    const task = tasks.find((item) => item.id === taskId);
+    if (!task) return;
+
+    setEditingTaskId(taskId);
+    setNewTask({
+      title: task.title,
+      dueDate: task.dueDate,
+      priority: task.priority,
+      category: task.category,
+    });
+    setIsTaskModalOpen(true);
+  };
+
   return (
     <>
       <DashboardLayout
         title="Tasks"
-        actions={<Button label="+ New task" onClick={() => setIsTaskModalOpen(true)} />}
+        actions={<Button label="+ New task" onClick={openCreateTaskModal} />}
       >
         <section className="grid gap-4 md:grid-cols-3">
           <Card className="p-5 shadow-lg">
@@ -279,6 +319,34 @@ const TasksPage: React.FC = () => {
                   />
                 ),
               },
+              {
+                id: "actions",
+                header: "Actions",
+                accessor: "id",
+                className: "text-right",
+                render: (task) => (
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      label="Edit"
+                      variant="secondary"
+                      className="px-3 py-1.5 text-xs"
+                      onClick={() => openEditTaskModal(task.id)}
+                    />
+                    <Button
+                      label="Delete"
+                      variant="danger"
+                      className="px-3 py-1.5 text-xs"
+                      onClick={() => {
+                        const confirmed = window.confirm(
+                          "Delete this task? This action cannot be undone."
+                        );
+                        if (!confirmed) return;
+                        deleteTask(task.id);
+                      }}
+                    />
+                  </div>
+                ),
+              },
             ]}
           />
 
@@ -295,9 +363,13 @@ const TasksPage: React.FC = () => {
       <Modal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)}>
         <div className="space-y-4">
           <div>
-            <h2 className="text-2xl font-semibold text-main-700">Create task</h2>
+            <h2 className="text-2xl font-semibold text-main-700">
+              {editingTaskId ? "Edit task" : "Create task"}
+            </h2>
             <p className="text-sm text-main-500">
-              Add a new task to your workspace.
+              {editingTaskId
+                ? "Update the task details."
+                : "Add a new task to your workspace."}
             </p>
           </div>
 
@@ -351,7 +423,10 @@ const TasksPage: React.FC = () => {
               variant="secondary"
               onClick={() => setIsTaskModalOpen(false)}
             />
-            <Button label="Save task" onClick={handleAddTask} />
+            <Button
+              label={editingTaskId ? "Save changes" : "Save task"}
+              onClick={handleAddTask}
+            />
           </div>
         </div>
       </Modal>

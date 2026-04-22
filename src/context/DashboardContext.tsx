@@ -1,9 +1,21 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useAuth } from "./AuthContext";
+import {
+  bulkMoveTasksToCategory,
+  ensureDashboardMeta,
+  deleteUserTask,
+  newUserTaskId,
+  setDashboardCategories,
+  setUserTask,
+  subscribeDashboardCategories,
+  subscribeUserTasks,
+  updateUserTask,
+} from "../api/firestoreDashboardApi";
 
 export type Priority = "High" | "Medium" | "Low";
 
 export type Task = {
-  id: number;
+  id: string;
   title: string;
   dueDate: string;
   priority: Priority;
@@ -38,80 +50,14 @@ type DashboardContextValue = {
   addCategory: (category: string) => boolean;
   renameCategory: (currentCategory: string, nextCategory: string) => boolean;
   deleteCategory: (category: string) => boolean;
-  toggleTaskStatus: (taskId: number) => void;
+  toggleTaskStatus: (taskId: string) => void;
+  updateTask: (taskId: string, updates: Partial<Omit<Task, "id">>) => boolean;
+  deleteTask: (taskId: string) => void;
 };
-
-const STORAGE_KEY = "todo-dashboard-state-v1";
 
 const getToday = () => new Date().toISOString().slice(0, 10);
 
-const initialTasks: Task[] = [
-  {
-    id: 1,
-    title: "Finish UI wireframes",
-    dueDate: "2026-04-02",
-    priority: "High",
-    completed: false,
-    category: "Work",
-    createdAt: "2026-03-29",
-  },
-  {
-    id: 2,
-    title: "Submit database assignment",
-    dueDate: "2026-04-03",
-    priority: "High",
-    completed: false,
-    category: "School",
-    createdAt: "2026-03-30",
-  },
-  {
-    id: 3,
-    title: "Buy groceries",
-    dueDate: "2026-04-01",
-    priority: "Medium",
-    completed: false,
-    category: "Personal",
-    createdAt: "2026-03-28",
-  },
-  {
-    id: 4,
-    title: "Review sprint backlog",
-    dueDate: "2026-04-05",
-    priority: "Medium",
-    completed: true,
-    category: "Work",
-    createdAt: "2026-03-27",
-  },
-  {
-    id: 5,
-    title: "Prepare presentation slides",
-    dueDate: "2026-04-06",
-    priority: "High",
-    completed: false,
-    category: "Work",
-    createdAt: "2026-03-31",
-  },
-  {
-    id: 6,
-    title: "Laundry and room cleanup",
-    dueDate: "2026-04-04",
-    priority: "Low",
-    completed: false,
-    category: "Personal",
-    createdAt: "2026-04-01",
-  },
-  {
-    id: 7,
-    title: "Read operating systems chapter",
-    dueDate: "2026-04-07",
-    priority: "Medium",
-    completed: true,
-    category: "School",
-    createdAt: "2026-03-26",
-  },
-];
-
-const initialCategories = ["Work", "Personal", "School"];
+const defaultCategories = ["Work", "Personal", "School"];
 
 export const priorityTone: Record<Priority, string> = {
   High: "bg-red-100 text-red-700",
@@ -120,27 +66,6 @@ export const priorityTone: Record<Priority, string> = {
 };
 
 const DashboardContext = createContext<DashboardContextValue | undefined>(undefined);
-
-const loadStoredState = () => {
-  if (typeof window === "undefined") {
-    return { tasks: initialTasks, categories: initialCategories };
-  }
-
-  const raw = window.localStorage.getItem(STORAGE_KEY);
-  if (!raw) {
-    return { tasks: initialTasks, categories: initialCategories };
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as { tasks?: Task[]; categories?: string[] };
-    return {
-      tasks: parsed.tasks?.length ? parsed.tasks : initialTasks,
-      categories: parsed.categories?.length ? parsed.categories : initialCategories,
-    };
-  } catch {
-    return { tasks: initialTasks, categories: initialCategories };
-  }
-};
 
 export const getGreeting = () => {
   const hour = new Date().getHours();
@@ -153,20 +78,38 @@ export const getGreeting = () => {
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const storedState = loadStoredState();
-  const [tasks, setTasks] = useState<Task[]>(storedState.tasks);
-  const [categories, setCategories] = useState<string[]>(storedState.categories);
+  const { user } = useAuth();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [categories, setCategories] = useState<string[]>(defaultCategories);
   const [banner, setBanner] = useState<string | null>(null);
   const today = getToday();
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!user) {
+      setTasks([]);
+      setCategories(defaultCategories);
+      return;
+    }
 
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ tasks, categories })
-    );
-  }, [tasks, categories]);
+    let isMounted = true;
+    void ensureDashboardMeta(user.uid, defaultCategories).catch(() => {
+      if (!isMounted) return;
+      setBanner("Failed to load dashboard settings.");
+    });
+
+    const unsubscribeCategories = subscribeDashboardCategories(user.uid, (next) => {
+      setCategories(next.length ? next : defaultCategories);
+    });
+    const unsubscribeTasks = subscribeUserTasks(user.uid, (next) => {
+      setTasks(next);
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribeCategories();
+      unsubscribeTasks();
+    };
+  }, [user]);
 
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((task) => task.completed).length;
@@ -192,12 +135,16 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const addTask = (task: TaskDraft) => {
-    if (!task.title.trim()) return;
+    if (!user) return;
 
+    const title = task.title.trim();
+    if (!title) return;
+
+    const taskId = newUserTaskId(user.uid);
     setTasks((prev) => [
       {
-        id: Date.now(),
-        title: task.title.trim(),
+        id: taskId,
+        title,
         dueDate: task.dueDate,
         priority: task.priority,
         completed: false,
@@ -207,18 +154,34 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       ...prev,
     ]);
     setBanner("New task created.");
+
+    void setUserTask(user.uid, taskId, {
+      title,
+      dueDate: task.dueDate,
+      priority: task.priority,
+      completed: false,
+      category: task.category,
+      createdAt: today,
+    }).catch(() => {
+      setBanner("Failed to save task. Please try again.");
+    });
   };
 
   const quickAddTask = (title: string, selectedCategory = "All Lists") => {
+    if (!user) return false;
+
     if (!title.trim()) return false;
 
     const defaultCategory =
       selectedCategory === "All Lists" ? categories[0] ?? "Work" : selectedCategory;
 
+    const trimmedTitle = title.trim();
+    const taskId = newUserTaskId(user.uid);
+
     setTasks((prev) => [
       {
-        id: Date.now(),
-        title: title.trim(),
+        id: taskId,
+        title: trimmedTitle,
         dueDate: today,
         priority: "Medium",
         completed: false,
@@ -228,20 +191,41 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       ...prev,
     ]);
     setBanner("Task added successfully.");
+
+    void setUserTask(user.uid, taskId, {
+      title: trimmedTitle,
+      dueDate: today,
+      priority: "Medium",
+      completed: false,
+      category: defaultCategory,
+      createdAt: today,
+    }).catch(() => {
+      setBanner("Failed to save task. Please try again.");
+    });
     return true;
   };
 
   const addCategory = (category: string) => {
+    if (!user) return false;
+
     const value = category.trim();
 
     if (!value || categories.includes(value)) return false;
 
-    setCategories((prev) => [...prev, value]);
+    setCategories((prev) => {
+      const next = [...prev, value];
+      void setDashboardCategories(user.uid, next).catch(() => {
+        setBanner("Failed to save category. Please try again.");
+      });
+      return next;
+    });
     setBanner("Category created.");
     return true;
   };
 
   const renameCategory = (currentCategory: string, nextCategory: string) => {
+    if (!user) return false;
+
     const trimmedNextCategory = nextCategory.trim();
 
     if (
@@ -255,11 +239,19 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (trimmedNextCategory === currentCategory) return true;
 
-    setCategories((prev) =>
-      prev.map((category) =>
-        category === currentCategory ? trimmedNextCategory : category
-      )
-    );
+    setCategories((prev) => {
+      const next = prev.map((item) =>
+        item === currentCategory ? trimmedNextCategory : item
+      );
+      void setDashboardCategories(user.uid, next)
+        .then(() =>
+          bulkMoveTasksToCategory(user.uid, currentCategory, trimmedNextCategory)
+        )
+        .catch(() => {
+          setBanner("Failed to update category. Please try again.");
+        });
+      return next;
+    });
     setTasks((prev) =>
       prev.map((task) =>
         task.category === currentCategory
@@ -272,12 +264,22 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const deleteCategory = (category: string) => {
+    if (!user) return false;
+
     if (!categories.includes(category) || categories.length <= 1) return false;
 
     const fallbackCategory =
-      categories.find((item) => item !== category) ?? initialCategories[0];
+      categories.find((item) => item !== category) ?? defaultCategories[0];
 
-    setCategories((prev) => prev.filter((item) => item !== category));
+    setCategories((prev) => {
+      const next = prev.filter((item) => item !== category);
+      void setDashboardCategories(user.uid, next)
+        .then(() => bulkMoveTasksToCategory(user.uid, category, fallbackCategory))
+        .catch(() => {
+          setBanner("Failed to delete category. Please try again.");
+        });
+      return next;
+    });
     setTasks((prev) =>
       prev.map((task) =>
         task.category === category
@@ -289,12 +291,68 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     return true;
   };
 
-  const toggleTaskStatus = (taskId: number) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    );
+  const toggleTaskStatus = (taskId: string) => {
+    if (!user) return;
+
+    setTasks((prev) => {
+      const current = prev.find((task) => task.id === taskId);
+      if (!current) return prev;
+
+      const nextCompleted = !current.completed;
+      void updateUserTask(user.uid, taskId, { completed: nextCompleted }).catch(
+        () => {
+          setBanner("Failed to update task. Please try again.");
+        }
+      );
+
+      return prev.map((task) =>
+        task.id === taskId ? { ...task, completed: nextCompleted } : task
+      );
+    });
+  };
+
+  const updateTask = (taskId: string, updates: Partial<Omit<Task, "id">>) => {
+    if (!user) return false;
+
+    const title = updates.title?.trim();
+    if (updates.title !== undefined && !title) return false;
+
+    setTasks((prev) => {
+      const existing = prev.find((task) => task.id === taskId);
+      if (!existing) return prev;
+
+      const nextTask = {
+        ...existing,
+        ...updates,
+        ...(updates.title !== undefined ? { title } : null),
+      } as Task;
+
+      void updateUserTask(user.uid, taskId, {
+        title: nextTask.title,
+        dueDate: nextTask.dueDate,
+        priority: nextTask.priority,
+        completed: nextTask.completed,
+        category: nextTask.category,
+        createdAt: nextTask.createdAt,
+      }).catch(() => {
+        setBanner("Failed to update task. Please try again.");
+      });
+
+      return prev.map((task) => (task.id === taskId ? nextTask : task));
+    });
+
+    return true;
+  };
+
+  const deleteTask = (taskId: string) => {
+    if (!user) return;
+
+    setTasks((prev) => prev.filter((task) => task.id !== taskId));
+    setBanner("Task deleted.");
+
+    void deleteUserTask(user.uid, taskId).catch(() => {
+      setBanner("Failed to delete task. Please try again.");
+    });
   };
 
   return (
@@ -319,6 +377,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
         renameCategory,
         deleteCategory,
         toggleTaskStatus,
+        updateTask,
+        deleteTask,
       }}
     >
       {children}
