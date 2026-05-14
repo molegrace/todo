@@ -23,13 +23,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { banner, setBanner } = useDashboard();
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-[radial-gradient(circle_at_top_right,rgba(186,230,253,0.4),transparent_35%),linear-gradient(to_bottom_right,var(--color-blue-50),white,var(--color-sky-100))] px-3 py-4 sm:px-6 sm:py-6">
-      <div className="mx-auto grid w-full max-w-7xl min-w-0 gap-4 sm:gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
-        <aside className="min-w-0 space-y-5">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[radial-gradient(circle_at_top_right,rgba(186,230,253,0.4),transparent_35%),linear-gradient(to_bottom_right,var(--color-blue-50),white,var(--color-sky-100))] px-3 py-4 sm:px-6 sm:py-6 xl:h-[calc(100vh-4.5rem)] xl:min-h-0 xl:overflow-hidden">
+      <div className="mx-auto grid w-full max-w-7xl min-w-0 gap-4 sm:gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[280px_minmax(0,1fr)]">
+        <aside className="min-w-0 space-y-5 xl:self-start">
           <DashboardSidebar activePath={location.pathname} />
         </aside>
-
-        <main className="min-w-0 space-y-4 sm:space-y-6">
+ 
+        <main className="min-w-0 space-y-4 sm:space-y-6 xl:h-full xl:overflow-y-auto xl:pr-2">
           {showHeaderCard && (
             <div className="rounded-3xl border border-main-200 bg-white/90 p-4 shadow-sm backdrop-blur-sm sm:rounded-4xl sm:p-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
