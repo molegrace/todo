@@ -145,38 +145,44 @@ const TasksPage: React.FC = () => {
     <>
       <DashboardLayout
         title="Tasks"
-        actions={<Button label="+ New task" onClick={openCreateTaskModal} />}
+        actions={
+          <Button
+            label="+ New task"
+            onClick={openCreateTaskModal}
+            className="w-full sm:w-auto"
+          />
+        }
       >
         <section className="grid gap-4 md:grid-cols-3">
-          <Card className="p-5 shadow-lg">
+          <Card className="p-4 shadow-lg sm:p-5">
             <p className="text-sm font-semibold text-main-700">Pending tasks</p>
-            <p className="mt-3 text-4xl font-bold text-main-700">{pendingTasks}</p>
+            <p className="mt-3 text-3xl font-bold text-main-700 sm:text-4xl">{pendingTasks}</p>
             <p className="mt-2 text-sm text-main-500">Still waiting for action</p>
           </Card>
-          <Card className="p-5 shadow-lg">
+          <Card className="p-4 shadow-lg sm:p-5">
             <p className="text-sm font-semibold text-main-700">Completed</p>
-            <p className="mt-3 text-4xl font-bold text-main-700">{completedTasks}</p>
+            <p className="mt-3 text-3xl font-bold text-main-700 sm:text-4xl">{completedTasks}</p>
             <p className="mt-2 text-sm text-main-500">Wrapped up and done</p>
           </Card>
-          <Card className="p-5 shadow-lg">
+          <Card className="p-4 shadow-lg sm:p-5">
             <p className="text-sm font-semibold text-main-700">Overdue</p>
-            <p className="mt-3 text-4xl font-bold text-main-700">{overdueTasks}</p>
+            <p className="mt-3 text-3xl font-bold text-main-700 sm:text-4xl">{overdueTasks}</p>
             <p className="mt-2 text-sm text-main-500">Need attention first</p>
           </Card>
         </section>
 
-        <Card className="space-y-5 p-6 shadow-lg">
+        <Card className="space-y-5 p-4 shadow-lg sm:p-6">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-main-500">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-main-500 sm:tracking-[0.24em]">
                 Filters
               </p>
-              <h2 className="mt-2 text-2xl font-bold text-main-700">
+              <h2 className="mt-2 text-xl font-bold text-main-700 sm:text-2xl">
                 Refine your task list
               </h2>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               {viewButtons.map((view) => (
                 <button
                   key={view.value}
@@ -250,13 +256,13 @@ const TasksPage: React.FC = () => {
           </div>
         </Card>
 
-        <Card className="space-y-5 p-6 shadow-lg">
+        <Card className="space-y-5 p-4 shadow-lg sm:p-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-main-500">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-main-500 sm:tracking-[0.24em]">
                 Task board
               </p>
-              <h2 className="mt-2 text-2xl font-bold text-main-700">
+              <h2 className="mt-2 text-xl font-bold text-main-700 sm:text-2xl">
                 Focused task management
               </h2>
             </div>
@@ -265,92 +271,168 @@ const TasksPage: React.FC = () => {
             </p>
           </div>
 
-          <Table
-            data={paginatedTasks}
-            emptyMessage="No tasks match the current filters."
-            columns={[
-              {
-                header: "Task",
-                accessor: "title",
-                render: (task) => (
-                  <div>
-                    <p className="font-semibold text-main-700">{task.title}</p>
-                    <p className="text-xs text-main-500">{task.category}</p>
-                  </div>
-                ),
-              },
-              {
-                header: "Due date",
-                accessor: "dueDate",
-                render: (task) => (
-                  <span
-                    className={
-                      task.completed
-                        ? "text-main-400"
-                        : task.dueDate < today
-                        ? "font-semibold text-red-600"
-                        : "text-main-600"
-                    }
+          <div className="sm:hidden">
+            {paginatedTasks.length === 0 ? (
+              <div className="rounded-2xl border border-main-200 bg-white px-4 py-8 text-center text-sm text-main-500">
+                No tasks match the current filters.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {paginatedTasks.map((task) => (
+                  <article
+                    key={task.id}
+                    className="rounded-2xl border border-main-200 bg-white p-4 shadow-sm"
                   >
-                    {task.dueDate}
-                  </span>
-                ),
-              },
-              {
-                header: "Priority",
-                accessor: "priority",
-                render: (task) => (
-                  <span
-                    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${priorityTone[task.priority]}`}
-                  >
-                    {task.priority}
-                  </span>
-                ),
-              },
-              {
-                id: "status",
-                header: "Status",
-                accessor: "completed",
-                render: (task) => (
-                  <Checkbox
-                    checked={task.completed}
-                    onChange={() => toggleTaskStatus(task.id)}
-                    label={task.completed ? "Done" : "Pending"}
-                  />
-                ),
-              },
-              {
-                id: "actions",
-                header: "Actions",
-                accessor: "id",
-                className: "text-right",
-                render: (task) => (
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      label="Edit"
-                      variant="secondary"
-                      className="px-3 py-1.5 text-xs"
-                      onClick={() => openEditTaskModal(task.id)}
-                    />
-                    <Button
-                      label="Delete"
-                      variant="danger"
-                      className="px-3 py-1.5 text-xs"
-                      onClick={() => {
-                        const confirmed = window.confirm(
-                          "Delete this task? This action cannot be undone."
-                        );
-                        if (!confirmed) return;
-                        deleteTask(task.id);
-                      }}
-                    />
-                  </div>
-                ),
-              },
-            ]}
-          />
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="break-words text-base font-semibold text-main-700">
+                          {task.title}
+                        </h3>
+                        <p className="mt-1 text-xs text-main-500">{task.category}</p>
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${priorityTone[task.priority]}`}
+                      >
+                        {task.priority}
+                      </span>
+                    </div>
 
-          <div className="flex justify-end">
+                    <div className="mt-4 grid gap-3 text-sm">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="font-medium text-main-500">Due date</span>
+                        <span
+                          className={
+                            task.completed
+                              ? "text-main-400"
+                              : task.dueDate < today
+                              ? "font-semibold text-red-600"
+                              : "text-main-600"
+                          }
+                        >
+                          {task.dueDate}
+                        </span>
+                      </div>
+                      <Checkbox
+                        checked={task.completed}
+                        onChange={() => toggleTaskStatus(task.id)}
+                        label={task.completed ? "Done" : "Pending"}
+                      />
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      <Button
+                        label="Edit"
+                        variant="secondary"
+                        className="w-full px-3 py-2 text-xs"
+                        onClick={() => openEditTaskModal(task.id)}
+                      />
+                      <Button
+                        label="Delete"
+                        variant="danger"
+                        className="w-full px-3 py-2 text-xs"
+                        onClick={() => {
+                          const confirmed = window.confirm(
+                            "Delete this task? This action cannot be undone."
+                          );
+                          if (!confirmed) return;
+                          deleteTask(task.id);
+                        }}
+                      />
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="hidden sm:block">
+            <Table
+              data={paginatedTasks}
+              emptyMessage="No tasks match the current filters."
+              columns={[
+                {
+                  header: "Task",
+                  accessor: "title",
+                  render: (task) => (
+                    <div>
+                      <p className="font-semibold text-main-700">{task.title}</p>
+                      <p className="text-xs text-main-500">{task.category}</p>
+                    </div>
+                  ),
+                },
+                {
+                  header: "Due date",
+                  accessor: "dueDate",
+                  render: (task) => (
+                    <span
+                      className={
+                        task.completed
+                          ? "text-main-400"
+                          : task.dueDate < today
+                          ? "font-semibold text-red-600"
+                          : "text-main-600"
+                      }
+                    >
+                      {task.dueDate}
+                    </span>
+                  ),
+                },
+                {
+                  header: "Priority",
+                  accessor: "priority",
+                  render: (task) => (
+                    <span
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${priorityTone[task.priority]}`}
+                    >
+                      {task.priority}
+                    </span>
+                  ),
+                },
+                {
+                  id: "status",
+                  header: "Status",
+                  accessor: "completed",
+                  render: (task) => (
+                    <Checkbox
+                      checked={task.completed}
+                      onChange={() => toggleTaskStatus(task.id)}
+                      label={task.completed ? "Done" : "Pending"}
+                    />
+                  ),
+                },
+                {
+                  id: "actions",
+                  header: "Actions",
+                  accessor: "id",
+                  className: "text-right",
+                  render: (task) => (
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        label="Edit"
+                        variant="secondary"
+                        className="px-3 py-1.5 text-xs"
+                        onClick={() => openEditTaskModal(task.id)}
+                      />
+                      <Button
+                        label="Delete"
+                        variant="danger"
+                        className="px-3 py-1.5 text-xs"
+                        onClick={() => {
+                          const confirmed = window.confirm(
+                            "Delete this task? This action cannot be undone."
+                          );
+                          if (!confirmed) return;
+                          deleteTask(task.id);
+                        }}
+                      />
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          </div>
+
+          <div className="flex justify-center sm:justify-end">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

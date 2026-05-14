@@ -23,25 +23,25 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { banner, setBanner } = useDashboard();
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(186,230,253,0.4),transparent_35%),linear-gradient(to_bottom_right,var(--color-blue-50),white,var(--color-sky-100))] px-4 py-6 sm:px-6">
-      <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[280px_1fr]">
-        <aside className="space-y-5">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(186,230,253,0.4),transparent_35%),linear-gradient(to_bottom_right,var(--color-blue-50),white,var(--color-sky-100))] px-3 py-4 sm:px-6 sm:py-6">
+      <div className="mx-auto grid max-w-7xl gap-4 sm:gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
+        <aside className="min-w-0 space-y-5">
           <DashboardSidebar activePath={location.pathname} />
         </aside>
 
-        <main className="space-y-6">
+        <main className="min-w-0 space-y-4 sm:space-y-6">
           {showHeaderCard && (
-            <div className="rounded-4xl border border-main-200 bg-white/90 p-6 shadow-sm backdrop-blur-sm">
+            <div className="rounded-3xl border border-main-200 bg-white/90 p-4 shadow-sm backdrop-blur-sm sm:rounded-4xl sm:p-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                  <h1 className="mt-2 text-3xl font-bold text-main-700 sm:text-4xl">
+                <div className="min-w-0">
+                  <h1 className="mt-2 break-words text-3xl font-bold text-main-700 sm:text-4xl">
                     {title}
                   </h1>
                   <p className="mt-3 max-w-3xl text-sm leading-7 text-main-500">
                     {description}
                   </p>
                 </div>
-                {actions && <div className="flex flex-wrap gap-3">{actions}</div>}
+                {actions && <div className="flex w-full flex-wrap gap-3 sm:w-auto">{actions}</div>}
               </div>
             </div>
           )}
