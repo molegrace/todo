@@ -6,14 +6,14 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   fullWidth?: boolean;
 }
 
-export const Input: React.FC<InputProps> = ({
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   label,
   error,
   fullWidth = true,
   className = "",
   id,
   ...props
-}) => {
+}, ref) => {
   const inputId = id || props.name;
 
   return (
@@ -28,6 +28,7 @@ export const Input: React.FC<InputProps> = ({
       )}
 
       <input
+        ref={ref}
         id={inputId}
         className={`
           rounded-lg border px-4 py-2
@@ -46,6 +47,8 @@ export const Input: React.FC<InputProps> = ({
       )}
     </div>
   );
-};
+});
+
+Input.displayName = "Input";
 
 export default Input;

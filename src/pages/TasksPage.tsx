@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Checkbox from "../components/Checkbox";
@@ -14,7 +14,7 @@ import {
 } from "../context/DashboardContext";
 import type { TaskDraft } from "../context/DashboardContext";
 
-type ViewFilter = "all" | "today" | "upcoming" | "completed";
+type ViewFilter = "all" | "pending" | "today" | "upcoming" | "completed" | "overdue";
 
 const viewButtons: { label: string; value: ViewFilter }[] = [
   { label: "All tasks", value: "all" },
@@ -43,8 +43,11 @@ const TasksPage: React.FC = () => {
   const [selectedView, setSelectedView] = useState<ViewFilter>("all");
   const [sortBy, setSortBy] = useState("dueDate");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const searchWrapperRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [newTask, setNewTask] = useState<TaskDraft>({
     title: "",
     dueDate: today,
@@ -63,9 +66,12 @@ const TasksPage: React.FC = () => {
         priorityFilter === "all" || task.priority === priorityFilter;
 
       let matchesView = true;
+      if (selectedView === "all") matchesView = !task.completed;
+      if (selectedView === "pending") matchesView = !task.completed;
       if (selectedView === "today") matchesView = task.dueDate === today && !task.completed;
       if (selectedView === "upcoming") matchesView = task.dueDate > today && !task.completed;
       if (selectedView === "completed") matchesView = task.completed;
+      if (selectedView === "overdue") matchesView = task.dueDate < today && !task.completed;
 
       return matchesSearch && matchesCategory && matchesPriority && matchesView;
     });
@@ -89,6 +95,60 @@ const TasksPage: React.FC = () => {
     (visiblePage - 1) * tasksPerPage,
     visiblePage * tasksPerPage
   );
+
+  useEffect(() => {
+    if (isSearchOpen) searchInputRef.current?.focus();
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    const handleClickOutsideSearch = (event: MouseEvent) => {
+      if (!searchWrapperRef.current) return;
+      if (searchWrapperRef.current.contains(event.target as Node)) return;
+      if (searchTerm) return;
+
+      setIsSearchOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutsideSearch);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideSearch);
+    };
+  }, [searchTerm]);
+
+  const applyStatFilter = (view: ViewFilter) => {
+    setSelectedView(view);
+    setSearchTerm("");
+    setPriorityFilter("all");
+    setSelectedCategory("all");
+    setCurrentPage(1);
+  };
+
+  const statCards: {
+    title: string;
+    value: number;
+    description: string;
+    view: ViewFilter;
+  }[] = [
+    {
+      title: "Pending tasks",
+      value: pendingTasks,
+      description: "Still waiting for action",
+      view: "pending",
+    },
+    {
+      title: "Completed",
+      value: completedTasks,
+      description: "Wrapped up and done",
+      view: "completed",
+    },
+    {
+      title: "Overdue",
+      value: overdueTasks,
+      description: "Need attention first",
+      view: "overdue",
+    },
+  ];
 
   const handleAddTask = () => {
     if (editingTaskId) {
@@ -151,21 +211,33 @@ const TasksPage: React.FC = () => {
         }
       >
         <section className="grid gap-4 md:grid-cols-3">
-          <Card className="p-4 shadow-lg sm:p-5">
-            <p className="text-sm font-semibold text-main-700">Pending tasks</p>
-            <p className="mt-3 text-3xl font-bold text-main-700 sm:text-4xl">{pendingTasks}</p>
-            <p className="mt-2 text-sm text-main-500">Still waiting for action</p>
-          </Card>
-          <Card className="p-4 shadow-lg sm:p-5">
-            <p className="text-sm font-semibold text-main-700">Completed</p>
-            <p className="mt-3 text-3xl font-bold text-main-700 sm:text-4xl">{completedTasks}</p>
-            <p className="mt-2 text-sm text-main-500">Wrapped up and done</p>
-          </Card>
-          <Card className="p-4 shadow-lg sm:p-5">
-            <p className="text-sm font-semibold text-main-700">Overdue</p>
-            <p className="mt-3 text-3xl font-bold text-main-700 sm:text-4xl">{overdueTasks}</p>
-            <p className="mt-2 text-sm text-main-500">Need attention first</p>
-          </Card>
+          {statCards.map((stat) => {
+            const isActive = selectedView === stat.view;
+
+            return (
+              <button
+                key={stat.view}
+                type="button"
+                onClick={() => applyStatFilter(stat.view)}
+                aria-pressed={isActive}
+                className={`min-w-0 max-w-full rounded-2xl border p-4 text-left shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-main-400 sm:p-5 ${
+                  isActive
+                    ? "border-main-700 bg-main-700 text-white"
+                    : "border-main-200 bg-white text-main-700"
+                }`}
+              >
+                <p className={`text-sm font-semibold ${isActive ? "text-white" : "text-main-700"}`}>
+                  {stat.title}
+                </p>
+                <p className={`mt-3 text-3xl font-bold sm:text-4xl ${isActive ? "text-white" : "text-main-700"}`}>
+                  {stat.value}
+                </p>
+                <p className={`mt-2 text-sm ${isActive ? "text-main-100" : "text-main-500"}`}>
+                  {stat.description}
+                </p>
+              </button>
+            );
+          })}
         </section>
 
         <Card className="space-y-5 p-4 shadow-lg sm:p-6">
@@ -199,73 +271,94 @@ const TasksPage: React.FC = () => {
               ))}
             </div>
           </div>
-
-          <div className="grid gap-3 lg:grid-cols-4">
-            <Input
-              label="Search"
-              placeholder="Search tasks..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full"
-            />
-            <Select
-              label="Category"
-              value={selectedCategory}
-              onChange={(e) => {
-                setSelectedCategory(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { label: "All categories", value: "all" },
-                ...categories.map((category) => ({
-                  label: category,
-                  value: category,
-                })),
-              ]}
-            />
-            <Select
-              label="Priority"
-              value={priorityFilter}
-              onChange={(e) => {
-                setPriorityFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { label: "All priorities", value: "all" },
-                { label: "High", value: "High" },
-                { label: "Medium", value: "Medium" },
-                { label: "Low", value: "Low" },
-              ]}
-            />
-            <Select
-              label="Sort by"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              options={[
-                { label: "Due date", value: "dueDate" },
-                { label: "Priority", value: "priority" },
-                { label: "Created date", value: "createdAt" },
-              ]}
-            />
-          </div>
         </Card>
 
         <Card className="space-y-5 p-4 shadow-lg sm:p-6">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(260px,360px)] xl:items-end">
+            <div className="min-w-0 space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-main-500 sm:tracking-[0.24em]">
                 Task board
               </p>
-              <h2 className="mt-2 text-xl font-bold text-main-700 sm:text-2xl">
-                Focused task management
-              </h2>
+              <div className="grid gap-3 md:grid-cols-3">
+                <Select
+                  label="Category"
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  options={[
+                    { label: "All categories", value: "all" },
+                    ...categories.map((category) => ({
+                      label: category,
+                      value: category,
+                    })),
+                  ]}
+                />
+                <Select
+                  label="Priority"
+                  value={priorityFilter}
+                  onChange={(e) => {
+                    setPriorityFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  options={[
+                    { label: "All priorities", value: "all" },
+                    { label: "High", value: "High" },
+                    { label: "Medium", value: "Medium" },
+                    { label: "Low", value: "Low" },
+                  ]}
+                />
+                <Select
+                  label="Sort by"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  options={[
+                    { label: "Due date", value: "dueDate" },
+                    { label: "Priority", value: "priority" },
+                    { label: "Created date", value: "createdAt" },
+                  ]}
+                />
+              </div>
             </div>
-            <p className="text-sm text-main-500">
-              Showing {paginatedTasks.length} of {filteredTasks.length} task(s)
-            </p>
+            <div className="flex justify-end" ref={searchWrapperRef}>
+              {isSearchOpen || searchTerm ? (
+                <div className="w-full">
+                  <Input
+                    ref={searchInputRef}
+                    label="Search"
+                    placeholder="Search tasks..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full"
+                  />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsSearchOpen(true)}
+                  aria-label="Search tasks"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl border border-main-200 bg-white text-main-600 shadow-sm transition hover:bg-main-50 hover:text-main-700 focus:outline-none focus:ring-2 focus:ring-main-400"
+                >
+                  <svg
+                    aria-hidden="true"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m21 21-4.3-4.3" />
+                    <circle cx="11" cy="11" r="8" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="min-w-0">
@@ -355,7 +448,10 @@ const TasksPage: React.FC = () => {
             />
           </div>
 
-          <div className="flex justify-center sm:justify-end">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-main-500">
+              Page {visiblePage} of {totalPages}
+            </p>
             <Pagination
               currentPage={visiblePage}
               totalPages={totalPages}
