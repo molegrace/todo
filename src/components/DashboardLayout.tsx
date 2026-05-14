@@ -23,8 +23,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { banner, setBanner } = useDashboard();
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(186,230,253,0.4),transparent_35%),linear-gradient(to_bottom_right,var(--color-blue-50),white,var(--color-sky-100))] px-3 py-4 sm:px-6 sm:py-6">
-      <div className="mx-auto grid max-w-7xl gap-4 sm:gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[radial-gradient(circle_at_top_right,rgba(186,230,253,0.4),transparent_35%),linear-gradient(to_bottom_right,var(--color-blue-50),white,var(--color-sky-100))] px-3 py-4 sm:px-6 sm:py-6">
+      <div className="mx-auto grid w-full max-w-7xl min-w-0 gap-4 sm:gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
         <aside className="min-w-0 space-y-5">
           <DashboardSidebar activePath={location.pathname} />
         </aside>

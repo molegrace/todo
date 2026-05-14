@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Checkbox from "../components/Checkbox";
@@ -84,14 +84,11 @@ const TasksPage: React.FC = () => {
 
   const tasksPerPage = 6;
   const totalPages = Math.max(1, Math.ceil(filteredTasks.length / tasksPerPage));
+  const visiblePage = Math.min(currentPage, totalPages);
   const paginatedTasks = filteredTasks.slice(
-    (currentPage - 1) * tasksPerPage,
-    currentPage * tasksPerPage
+    (visiblePage - 1) * tasksPerPage,
+    visiblePage * tasksPerPage
   );
-
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-  }, [currentPage, totalPages]);
 
   const handleAddTask = () => {
     if (editingTaskId) {
@@ -182,7 +179,7 @@ const TasksPage: React.FC = () => {
               </h2>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+            <div className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               {viewButtons.map((view) => (
                 <button
                   key={view.value}
@@ -191,7 +188,7 @@ const TasksPage: React.FC = () => {
                     setSelectedView(view.value);
                     setCurrentPage(1);
                   }}
-                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                  className={`min-w-0 rounded-full px-3 py-2 text-center text-sm font-medium transition sm:px-4 ${
                     selectedView === view.value
                       ? "bg-main-700 text-white"
                       : "bg-main-100 text-main-600 hover:bg-main-200"
@@ -271,81 +268,7 @@ const TasksPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="sm:hidden">
-            {paginatedTasks.length === 0 ? (
-              <div className="rounded-2xl border border-main-200 bg-white px-4 py-8 text-center text-sm text-main-500">
-                No tasks match the current filters.
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {paginatedTasks.map((task) => (
-                  <article
-                    key={task.id}
-                    className="rounded-2xl border border-main-200 bg-white p-4 shadow-sm"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <h3 className="break-words text-base font-semibold text-main-700">
-                          {task.title}
-                        </h3>
-                        <p className="mt-1 text-xs text-main-500">{task.category}</p>
-                      </div>
-                      <span
-                        className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${priorityTone[task.priority]}`}
-                      >
-                        {task.priority}
-                      </span>
-                    </div>
-
-                    <div className="mt-4 grid gap-3 text-sm">
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="font-medium text-main-500">Due date</span>
-                        <span
-                          className={
-                            task.completed
-                              ? "text-main-400"
-                              : task.dueDate < today
-                              ? "font-semibold text-red-600"
-                              : "text-main-600"
-                          }
-                        >
-                          {task.dueDate}
-                        </span>
-                      </div>
-                      <Checkbox
-                        checked={task.completed}
-                        onChange={() => toggleTaskStatus(task.id)}
-                        label={task.completed ? "Done" : "Pending"}
-                      />
-                    </div>
-
-                    <div className="mt-4 grid grid-cols-2 gap-2">
-                      <Button
-                        label="Edit"
-                        variant="secondary"
-                        className="w-full px-3 py-2 text-xs"
-                        onClick={() => openEditTaskModal(task.id)}
-                      />
-                      <Button
-                        label="Delete"
-                        variant="danger"
-                        className="w-full px-3 py-2 text-xs"
-                        onClick={() => {
-                          const confirmed = window.confirm(
-                            "Delete this task? This action cannot be undone."
-                          );
-                          if (!confirmed) return;
-                          deleteTask(task.id);
-                        }}
-                      />
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="hidden sm:block">
+          <div className="min-w-0">
             <Table
               data={paginatedTasks}
               emptyMessage="No tasks match the current filters."
@@ -434,7 +357,7 @@ const TasksPage: React.FC = () => {
 
           <div className="flex justify-center sm:justify-end">
             <Pagination
-              currentPage={currentPage}
+              currentPage={visiblePage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
             />

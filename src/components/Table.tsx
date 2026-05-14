@@ -20,8 +20,8 @@ function Table<T extends { id: string | number }>({
   emptyMessage = "No data available.",
 }: TableProps<T>) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-main-200">
-      <table className="min-w-full bg-white">
+    <div className="max-w-full overflow-x-auto rounded-2xl border border-main-200">
+      <table className="min-w-[720px] bg-white sm:min-w-full">
         <thead className="bg-main-100 text-left text-sm text-main-600">
           <tr>
             {columns.map((col) => (

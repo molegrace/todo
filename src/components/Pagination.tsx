@@ -12,7 +12,7 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
 }) => {
   return (
-    <div className="flex gap-2">
+    <div className="flex max-w-full flex-wrap justify-center gap-2">
       {Array.from({ length: totalPages }, (_, i) => (
         <button
           key={i}

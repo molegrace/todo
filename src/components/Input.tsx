@@ -17,7 +17,7 @@ export const Input: React.FC<InputProps> = ({
   const inputId = id || props.name;
 
   return (
-    <div className={`${fullWidth ? "w-full" : ""}`}>
+    <div className={`min-w-0 ${fullWidth ? "w-full" : ""}`}>
       {label && (
         <label
           htmlFor={inputId}
@@ -31,6 +31,7 @@ export const Input: React.FC<InputProps> = ({
         id={inputId}
         className={`
           rounded-lg border px-4 py-2
+          min-w-0 w-full
           transition duration-200
           focus:outline-none focus:ring-2 focus:ring-main-400
           disabled:cursor-not-allowed disabled:bg-main-100

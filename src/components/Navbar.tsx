@@ -88,24 +88,24 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
   };
 
   return (
-    <nav className="navbar-enter flex items-center justify-between border-b border-main-300 bg-main-100 px-6 py-3 text-main-600 shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center rounded-2xl bg-white px-2 py-1 shadow-md ring-1 ring-main-200 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg">
+    <nav className="navbar-enter sticky top-0 z-50 flex w-full max-w-full items-center justify-between gap-3 overflow-x-clip border-b border-main-300 bg-main-100 px-3 py-3 text-main-600 shadow-sm sm:px-6">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex shrink-0 items-center justify-center rounded-2xl bg-white px-2 py-1 shadow-md ring-1 ring-main-200 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg">
           <img
             src={logo}
             alt="Todo logo"
-            className="h-12 w-auto max-w-none object-contain transition duration-300 hover:scale-105"
+            className="h-10 w-auto object-contain transition duration-300 hover:scale-105 sm:h-12"
           />
         </div>
-        <div>
-          <h1 className="text-lg font-bold tracking-tight text-blue-700">
+        <div className="min-w-0">
+          <h1 className="truncate text-base font-bold tracking-tight text-blue-700 sm:text-lg">
             {title}
           </h1>
-          <p className="text-xs text-main-500">Organize your day with ease</p>
+          <p className="truncate text-xs text-main-500">Organize your day with ease</p>
         </div>
       </div>
 
-      <div className="relative" ref={menuRef}>
+      <div className="relative shrink-0" ref={menuRef}>
         <button
           type="button"
           onClick={handleMenuToggle}
@@ -121,7 +121,7 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
         </button>
 
         {isMenuOpen && (
-          <div className="navbar-menu-enter absolute right-0 top-14 z-20 flex w-48 flex-col rounded-2xl border border-main-200 bg-white p-2 shadow-xl">
+          <div className="navbar-menu-enter absolute right-0 top-14 z-20 flex w-48 max-w-[calc(100vw-1.5rem)] flex-col rounded-2xl border border-main-200 bg-white p-2 shadow-xl">
             {logoutError && (
               <div className="px-3 py-2 text-xs text-red-700" role="alert">
                 {logoutError}

@@ -11,7 +11,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const baseStyle =
-  "px-4 py-2 rounded font-medium transition focus:outline-none";
+  "inline-flex min-w-0 items-center justify-center rounded px-4 py-2 text-center font-medium transition focus:outline-none";
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: "bg-main-500 text-white hover:bg-main-600",
