@@ -88,7 +88,7 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
   };
 
   return (
-    <nav className="navbar-enter sticky top-0 z-50 flex w-full max-w-full items-center justify-between gap-3 overflow-x-clip border-b border-main-300 bg-main-100 px-3 py-3 text-main-600 shadow-sm sm:px-6">
+    <nav className="navbar-enter sticky top-0 z-50 flex h-16 w-full max-w-full items-center justify-between gap-3 overflow-x-clip border-b border-main-300 bg-main-100 px-3 text-main-600 shadow-sm sm:h-[4.5rem] sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex shrink-0 items-center justify-center rounded-2xl bg-white px-2 py-1 shadow-md ring-1 ring-main-200 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg">
           <img
