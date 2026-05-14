@@ -21,6 +21,11 @@ export type FirestoreTaskDoc = {
   completed: boolean;
   category: string;
   createdAt: string;
+  images?: {
+    id: string;
+    url: string;
+    caption: string;
+  }[];
 };
 
 type DashboardMetaDoc = {

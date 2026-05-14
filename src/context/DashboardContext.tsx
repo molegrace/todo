@@ -14,6 +14,12 @@ import {
 
 export type Priority = "High" | "Medium" | "Low";
 
+export type TaskImage = {
+  id: string;
+  url: string;
+  caption: string;
+};
+
 export type Task = {
   id: string;
   title: string;
@@ -22,6 +28,7 @@ export type Task = {
   completed: boolean;
   category: string;
   createdAt: string;
+  images: TaskImage[];
 };
 
 export type TaskDraft = {
@@ -29,6 +36,7 @@ export type TaskDraft = {
   dueDate: string;
   priority: Priority;
   category: string;
+  images: TaskImage[];
 };
 
 type DashboardContextValue = {
@@ -108,7 +116,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       setCategories(next.length ? next : defaultCategories);
     });
     const unsubscribeTasks = subscribeUserTasks(user.uid, (next) => {
-      setTasks(next);
+      setTasks(next.map((task) => ({ ...task, images: task.images ?? [] })));
     });
 
     return () => {
@@ -163,6 +171,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
         completed: false,
         category: task.category,
         createdAt: today,
+        images: task.images,
       },
       ...prev,
     ]);
@@ -175,6 +184,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       completed: false,
       category: task.category,
       createdAt: today,
+      images: task.images,
     }).catch((error) => {
       if (import.meta.env.DEV) console.error("Failed to save task:", error);
       setTasks((prev) => prev.filter((item) => item.id !== taskId));
@@ -202,6 +212,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
         completed: false,
         category: defaultCategory,
         createdAt: today,
+        images: [],
       },
       ...prev,
     ]);
@@ -214,6 +225,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       completed: false,
       category: defaultCategory,
       createdAt: today,
+      images: [],
     }).catch((error) => {
       if (import.meta.env.DEV) console.error("Failed to quick-save task:", error);
       setTasks((prev) => prev.filter((item) => item.id !== taskId));
@@ -351,6 +363,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
         completed: nextTask.completed,
         category: nextTask.category,
         createdAt: nextTask.createdAt,
+        images: nextTask.images,
       }).catch(() => {
         setBanner({ type: "error", message: "Failed to update task. Please try again." });
       });

@@ -12,7 +12,7 @@ import {
   priorityTone,
   useDashboard,
 } from "../context/DashboardContext";
-import type { TaskDraft } from "../context/DashboardContext";
+import type { Task, TaskDraft, TaskImage } from "../context/DashboardContext";
 
 type ViewFilter = "all" | "pending" | "today" | "upcoming" | "completed" | "overdue";
 
@@ -46,6 +46,8 @@ const TasksPage: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [viewingTask, setViewingTask] = useState<Task | null>(null);
+  const [viewingImage, setViewingImage] = useState<TaskImage | null>(null);
   const searchWrapperRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [newTask, setNewTask] = useState<TaskDraft>({
@@ -53,6 +55,7 @@ const TasksPage: React.FC = () => {
     dueDate: today,
     priority: "Medium",
     category: categories[0] ?? "Work",
+    images: [],
   });
 
   const filteredTasks = useMemo(() => {
@@ -157,6 +160,7 @@ const TasksPage: React.FC = () => {
         dueDate: newTask.dueDate,
         priority: newTask.priority,
         category: newTask.category,
+        images: newTask.images,
       });
       if (!updated) return;
     } else {
@@ -170,6 +174,7 @@ const TasksPage: React.FC = () => {
       dueDate: today,
       priority: "Medium",
       category: categories[0] ?? "Work",
+      images: [],
     });
   };
 
@@ -180,6 +185,7 @@ const TasksPage: React.FC = () => {
       dueDate: today,
       priority: "Medium",
       category: categories[0] ?? "Work",
+      images: [],
     });
     setIsTaskModalOpen(true);
   };
@@ -194,8 +200,53 @@ const TasksPage: React.FC = () => {
       dueDate: task.dueDate,
       priority: task.priority,
       category: task.category,
+      images: task.images,
     });
     setIsTaskModalOpen(true);
+  };
+
+  const handleTaskImagesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    if (!files.length) return;
+
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const url = typeof reader.result === "string" ? reader.result : "";
+        if (!url) return;
+
+        setNewTask((prev) => ({
+          ...prev,
+          images: [
+            ...prev.images,
+            {
+              id: `${Date.now()}-${file.name}-${Math.random().toString(36).slice(2)}`,
+              url,
+              caption: "",
+            },
+          ],
+        }));
+      };
+      reader.readAsDataURL(file);
+    });
+
+    event.target.value = "";
+  };
+
+  const updateTaskImageCaption = (imageId: string, caption: string) => {
+    setNewTask((prev) => ({
+      ...prev,
+      images: prev.images.map((image) =>
+        image.id === imageId ? { ...image, caption } : image
+      ),
+    }));
+  };
+
+  const removeTaskImage = (imageId: string) => {
+    setNewTask((prev) => ({
+      ...prev,
+      images: prev.images.filter((image) => image.id !== imageId),
+    }));
   };
 
   return (
@@ -205,6 +256,7 @@ const TasksPage: React.FC = () => {
         actions={
           <Button
             label="+ New task"
+            variant="secondary"
             onClick={openCreateTaskModal}
             className="w-full sm:w-auto"
           />
@@ -246,9 +298,7 @@ const TasksPage: React.FC = () => {
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-main-500 sm:tracking-[0.24em]">
                 Filters
               </p>
-              <h2 className="mt-2 text-xl font-bold text-main-700 sm:text-2xl">
-                Refine your task list
-              </h2>
+              
             </div>
 
             <div className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:flex-wrap">
@@ -424,6 +474,12 @@ const TasksPage: React.FC = () => {
                   render: (task) => (
                     <div className="flex justify-end gap-2">
                       <Button
+                        label="View"
+                        variant="secondary"
+                        className="px-3 py-1.5 text-xs"
+                        onClick={() => setViewingTask(task)}
+                      />
+                      <Button
                         label="Edit"
                         variant="secondary"
                         className="px-3 py-1.5 text-xs"
@@ -518,6 +574,51 @@ const TasksPage: React.FC = () => {
             }))}
           />
 
+          <div className="space-y-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-main-700">
+                Pictures
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleTaskImagesChange}
+                className="block w-full rounded-lg border border-main-300 bg-white px-4 py-2 text-sm text-main-700 file:mr-4 file:rounded-lg file:border-0 file:bg-main-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-main-700 hover:file:bg-main-200 focus:outline-none focus:ring-2 focus:ring-main-400"
+              />
+            </div>
+
+            {newTask.images.length > 0 && (
+              <div className="grid gap-3">
+                {newTask.images.map((image, index) => (
+                  <div
+                    key={image.id}
+                    className="grid gap-3 rounded-2xl border border-main-200 p-3 sm:grid-cols-[96px_minmax(0,1fr)_auto] sm:items-start"
+                  >
+                    <img
+                      src={image.url}
+                      alt={image.caption || `Task picture ${index + 1}`}
+                      className="h-24 w-full rounded-xl object-cover sm:w-24"
+                    />
+                    <Input
+                      label="Caption"
+                      placeholder="Write image caption..."
+                      value={image.caption}
+                      onChange={(e) => updateTaskImageCaption(image.id, e.target.value)}
+                      className="w-full"
+                    />
+                    <Button
+                      label="Remove"
+                      variant="danger"
+                      className="px-3 py-2 text-xs"
+                      onClick={() => removeTaskImage(image.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="flex justify-end gap-3">
             <Button
               label="Cancel"
@@ -531,6 +632,100 @@ const TasksPage: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      <Modal
+        isOpen={Boolean(viewingTask)}
+        onClose={() => {
+          setViewingTask(null);
+          setViewingImage(null);
+        }}
+      >
+        {viewingTask && (
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-2xl font-semibold text-main-700">
+                {viewingTask.title}
+              </h2>
+              <p className="text-sm text-main-500">
+                Created {viewingTask.createdAt}
+              </p>
+            </div>
+
+            <div className="grid gap-3 text-sm sm:grid-cols-2">
+              <div className="rounded-2xl bg-main-50 p-4">
+                <p className="font-medium text-main-500">Category</p>
+                <p className="mt-1 font-semibold text-main-700">{viewingTask.category}</p>
+              </div>
+              <div className="rounded-2xl bg-main-50 p-4">
+                <p className="font-medium text-main-500">Priority</p>
+                <p className="mt-1 font-semibold text-main-700">{viewingTask.priority}</p>
+              </div>
+              <div className="rounded-2xl bg-main-50 p-4">
+                <p className="font-medium text-main-500">Due date</p>
+                <p className="mt-1 font-semibold text-main-700">{viewingTask.dueDate}</p>
+              </div>
+              <div className="rounded-2xl bg-main-50 p-4">
+                <p className="font-medium text-main-500">Status</p>
+                <p className="mt-1 font-semibold text-main-700">
+                  {viewingTask.completed ? "Done" : "Pending"}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-main-700">Pictures</h3>
+              {viewingTask.images.length === 0 ? (
+                <p className="mt-2 text-sm text-main-500">
+                  No pictures were added to this task.
+                </p>
+              ) : (
+                <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                  {viewingTask.images.map((image, index) => (
+                    <button
+                      type="button"
+                      key={image.id}
+                      onClick={() => setViewingImage(image)}
+                      className="overflow-hidden rounded-2xl border border-main-200 bg-white text-left transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-main-400"
+                    >
+                      <img
+                        src={image.url}
+                        alt={image.caption || `Task picture ${index + 1}`}
+                        className="h-48 w-full object-cover"
+                      />
+                      <span className="block p-3 text-sm text-main-600">
+                        {image.caption || "No caption"}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {viewingImage && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 px-4 py-6">
+          <div className="relative max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white p-4 shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setViewingImage(null)}
+              aria-label="Close image preview"
+              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-xl font-semibold text-main-700 shadow-sm transition hover:bg-main-100"
+            >
+              x
+            </button>
+            <img
+              src={viewingImage.url}
+              alt={viewingImage.caption || "Task picture preview"}
+              className="max-h-[72vh] w-full rounded-2xl object-contain"
+            />
+            <p className="mt-4 text-sm text-main-600">
+              {viewingImage.caption || "No caption"}
+            </p>
+          </div>
+        </div>
+      )}
     </>
   );
 };
