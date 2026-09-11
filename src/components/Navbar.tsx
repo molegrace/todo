@@ -20,13 +20,20 @@ type MenuActionItem = {
 
 const Navbar: React.FC<NavbarProps> = ({ title }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, initializing } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
+
   const isAuthenticated = !initializing && Boolean(user);
+  const isDashboardRoute = location.pathname.startsWith("/dashboard");
+
+  // On dashboard routes, DashboardLayout renders its own full-height sidebar and header
+  if (isDashboardRoute) {
+    return null;
+  }
 
   const handleMenuClose = () => {
     setIsMenuOpen(false);
@@ -48,6 +55,25 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleMenuToggle = () => {
+    setIsMenuOpen((prev) => !prev);
+  };
+
+  // Outside navigation bar (Public pages)
   const menuItems = (
     [
       ...(isAuthenticated ? [{ label: "Dashboard", to: "/dashboard" }] : []),
@@ -68,24 +94,6 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
     if (item.to === "/dashboard") return location.pathname === "/dashboard" ? false : true;
     return item.to !== location.pathname;
   });
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleMenuToggle = () => {
-    setIsMenuOpen((prev) => !prev);
-  };
 
   return (
     <nav className="navbar-enter sticky top-0 z-50 flex h-16 w-full max-w-full items-center justify-between gap-3 overflow-x-clip border-b border-main-300 bg-main-100 px-3 text-main-600 shadow-sm sm:h-[4.5rem] sm:px-6">

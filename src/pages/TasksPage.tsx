@@ -16,13 +16,6 @@ import type { Task, TaskDraft, TaskImage } from "../context/DashboardContext";
 
 type ViewFilter = "all" | "pending" | "today" | "upcoming" | "completed" | "overdue";
 
-const viewButtons: { label: string; value: ViewFilter }[] = [
-  { label: "All tasks", value: "all" },
-  { label: "Today", value: "today" },
-  { label: "Upcoming", value: "upcoming" },
-  { label: "Completed", value: "completed" },
-];
-
 const TasksPage: React.FC = () => {
   const {
     tasks,
@@ -252,7 +245,7 @@ const TasksPage: React.FC = () => {
   return (
     <>
       <DashboardLayout
-        title="Tasks"
+        title=""
         actions={
           <Button
             label="+ New task"
@@ -293,43 +286,28 @@ const TasksPage: React.FC = () => {
         </section>
 
         <Card className="space-y-5 p-4 shadow-lg sm:p-6">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-main-500 sm:tracking-[0.24em]">
-                Filters
-              </p>
-              
-            </div>
-
-            <div className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-              {viewButtons.map((view) => (
-                <button
-                  key={view.value}
-                  type="button"
-                  onClick={() => {
-                    setSelectedView(view.value);
-                    setCurrentPage(1);
-                  }}
-                  className={`min-w-0 rounded-full px-3 py-2 text-center text-sm font-medium transition sm:px-4 ${
-                    selectedView === view.value
-                      ? "bg-main-700 text-white"
-                      : "bg-main-100 text-main-600 hover:bg-main-200"
-                  }`}
-                >
-                  {view.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </Card>
-
-        <Card className="space-y-5 p-4 shadow-lg sm:p-6">
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(260px,360px)] xl:items-end">
             <div className="min-w-0 space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-main-500 sm:tracking-[0.24em]">
                 Task board
               </p>
-              <div className="grid gap-3 md:grid-cols-3">
+              <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+                <Select
+                  label="Status"
+                  value={selectedView}
+                  onChange={(e) => {
+                    setSelectedView(e.target.value as ViewFilter);
+                    setCurrentPage(1);
+                  }}
+                  options={[
+                    { label: "All tasks", value: "all" },
+                    { label: "Today", value: "today" },
+                    { label: "Upcoming", value: "upcoming" },
+                    { label: "Completed", value: "completed" },
+                    { label: "Pending", value: "pending" },
+                    { label: "Overdue", value: "overdue" },
+                  ]}
+                />
                 <Select
                   label="Category"
                   value={selectedCategory}

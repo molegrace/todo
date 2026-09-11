@@ -27,9 +27,10 @@ const DashboardPage: React.FC = () => {
       description="A clear summary of what matters today."
       showHeaderCard={false}
     >
-      <section className="overflow-hidden rounded-[2rem] border border-main-200 bg-white p-6 text-main-600 shadow-xl sm:p-8">
+      {/* Greeting Header & Count Cards */}
+      <section className="py-2 text-main-600">
         <div className="space-y-6">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-6">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:gap-6">
             <p className="pt-2 text-xs uppercase tracking-[0.3em] text-main-500">
               {getGreeting()}
             </p>
@@ -47,7 +48,7 @@ const DashboardPage: React.FC = () => {
             ].map((item) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-main-200 bg-main-100 px-4 py-4 shadow-lg shadow-main-200/60"
+                className="rounded-2xl border border-main-200 bg-white/90 p-4 shadow-sm backdrop-blur-sm transition duration-300 hover:shadow-md"
               >
                 <p className="text-xs uppercase tracking-[0.18em] text-main-500">
                   {item.label}
