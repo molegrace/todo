@@ -66,7 +66,6 @@ const Contact: React.FC = () => {
       setForm((prev) => ({ ...prev, message: "" }));
     } catch (error) {
       if (import.meta.env.DEV) {
-        // Helpful while developing: show the actual Firebase/Firestore error in console.
         console.error("Failed to send contact message:", error);
       }
       setStatus({ type: "error", message: getContactMessageErrorMessage(error) });
@@ -127,7 +126,7 @@ const Contact: React.FC = () => {
             <Button
               type="submit"
               label={isSubmitting ? "Sending..." : "Send Message"}
-              className="rounded-lg bg-main-400 py-2 text-white transition hover:bg-main-500 disabled:cursor-not-allowed disabled:opacity-70"
+              className="w-full disabled:cursor-not-allowed disabled:opacity-70"
               disabled={isSubmitting || !user}
             />
 

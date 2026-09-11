@@ -47,7 +47,13 @@ const SignupPage: React.FC = () => {
 
     try {
       await registerUser(formData);
-      navigate("/login", { state: { registered: true } });
+      navigate("/login", {
+        state: {
+          registered: true,
+          email: formData.email.trim(),
+          emailVerificationSent: true,
+        },
+      });
     } catch (error) {
       const details = getRegisterErrorDetails(error);
       if (details.field) setFieldErrors({ [details.field]: details.message });
@@ -142,7 +148,7 @@ const SignupPage: React.FC = () => {
 
             <Button
               type="submit"
-              label={isSubmitting ? "Creating..." : "Create Account"}
+              label={isSubmitting ? "Creating Account..." : "Create Account"}
               className="w-full"
               disabled={isSubmitting}
             />

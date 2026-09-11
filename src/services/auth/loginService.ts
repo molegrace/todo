@@ -1,6 +1,6 @@
 import { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
-import { loginWithEmailPassword } from "../../api/firebaseAuthApi";
+import { loginWithEmailPassword, resendVerificationEmailApi } from "../../api/firebaseAuthApi";
 
 export type LoginInput = {
   email: string;
@@ -41,9 +41,19 @@ export const loginUser = async (input: LoginInput): Promise<LoginResult> => {
   return { user: credential.user };
 };
 
+export const resendVerificationEmail = async (input: LoginInput): Promise<void> => {
+  assertValidLoginInput(input);
+
+  await resendVerificationEmailApi(
+    input.email.trim(),
+    input.password
+  );
+};
+
 export type LoginErrorDetails = {
   field?: LoginField;
   message: string;
+  isUnverified?: boolean;
 };
 
 export const getLoginErrorDetails = (error: unknown): LoginErrorDetails => {
@@ -53,6 +63,14 @@ export const getLoginErrorDetails = (error: unknown): LoginErrorDetails => {
 
   if (error instanceof FirebaseError) {
     switch (error.code) {
+      case "auth/email-not-verified":
+        return {
+          message:
+            "Your email address is not verified. Please check your inbox and click the verification link before logging in.",
+          isUnverified: true,
+        };
+      case "auth/email-already-verified":
+        return { message: "Your email is already verified. Please log in directly." };
       case "auth/invalid-email":
         return { field: "email", message: "Please enter a valid email address." };
       case "auth/user-not-found":
@@ -77,10 +95,9 @@ export const getLoginErrorDetails = (error: unknown): LoginErrorDetails => {
             "This app isn't authorized to use the provided Firebase API key. Verify your Firebase config and API key restrictions (HTTP referrers).",
         };
       default:
-        return { message: "Failed to log in. Please try again." };
+        return { message: error.message || "Failed to log in. Please try again." };
     }
   }
 
   return { message: "Something went wrong. Please try again." };
 };
-

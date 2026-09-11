@@ -23,14 +23,14 @@ const Home: React.FC = () => {
           <div className="home-reveal home-reveal-delay-3 mt-8 flex flex-col justify-center gap-4 sm:flex-row md:justify-start">
             <Link
               to="/register"
-              className="rounded-lg bg-main-500 px-6 py-3 text-white transition hover:bg-main-600"
+              className="rounded-xl border border-main-300 bg-main-100 px-6 py-3 font-medium text-main-700 shadow-sm transition hover:bg-main-200 hover:border-main-400"
             >
               Get Started
             </Link>
 
             <Link
               to="/about"
-              className="rounded-lg border border-main-300 px-6 py-3 text-main-600 transition hover:bg-main-50"
+              className="rounded-xl border border-main-300 px-6 py-3 font-medium text-main-600 transition hover:bg-main-50"
             >
               Learn More
             </Link>

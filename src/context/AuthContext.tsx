@@ -25,6 +25,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
+      if (nextUser && !nextUser.emailVerified) {
+        clearAuthSession();
+        setUser(null);
+        setInitializing(false);
+        void logoutFirebase();
+        return;
+      }
+
       if (nextUser && isAuthSessionExpired(nextUser.uid)) {
         clearAuthSession();
         setUser(null);
@@ -34,7 +42,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (nextUser && !hasAuthSession(nextUser.uid)) {
-        // Existing sessions from before the 24-hour limit start their timer now.
         startAuthSession(nextUser.uid);
       }
 
@@ -90,4 +97,3 @@ export const useAuth = () => {
   if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };
-
