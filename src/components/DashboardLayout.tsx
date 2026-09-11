@@ -127,16 +127,32 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               onClick={() => setIsProfileMenuOpen((prev) => !prev)}
               aria-expanded={isProfileMenuOpen}
               aria-label="Open profile menu"
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-main-700 font-bold text-white shadow-md ring-2 ring-main-200 transition duration-300 hover:scale-105 hover:ring-main-400 focus:outline-none"
+              className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-main-700 font-bold text-white shadow-md ring-2 ring-main-200 transition duration-300 hover:scale-105 hover:ring-main-400 focus:outline-none"
             >
-              {avatarLabel}
+              {user?.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt="User avatar"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                avatarLabel
+              )}
             </button>
 
             {isProfileMenuOpen && (
               <div className="navbar-menu-enter absolute right-0 top-14 z-50 flex w-64 max-w-[calc(100vw-1.5rem)] flex-col rounded-3xl border border-main-200 bg-white p-4 shadow-2xl">
                 <div className="flex items-center gap-3 border-b border-main-100 pb-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-main-700 text-xs font-bold text-white shadow-sm">
-                    {avatarLabel}
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-main-700 text-xs font-bold text-white shadow-sm">
+                    {user?.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt="User avatar"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      avatarLabel
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-main-700">

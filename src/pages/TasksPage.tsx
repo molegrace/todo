@@ -288,12 +288,8 @@ const TasksPage: React.FC = () => {
         <Card className="space-y-5 p-4 shadow-lg sm:p-6">
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(260px,360px)] xl:items-end">
             <div className="min-w-0 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-main-500 sm:tracking-[0.24em]">
-                Task board
-              </p>
               <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
                 <Select
-                  label="Status"
                   value={selectedView}
                   onChange={(e) => {
                     setSelectedView(e.target.value as ViewFilter);
@@ -309,7 +305,6 @@ const TasksPage: React.FC = () => {
                   ]}
                 />
                 <Select
-                  label="Category"
                   value={selectedCategory}
                   onChange={(e) => {
                     setSelectedCategory(e.target.value);
@@ -324,7 +319,6 @@ const TasksPage: React.FC = () => {
                   ]}
                 />
                 <Select
-                  label="Priority"
                   value={priorityFilter}
                   onChange={(e) => {
                     setPriorityFilter(e.target.value);
@@ -338,7 +332,6 @@ const TasksPage: React.FC = () => {
                   ]}
                 />
                 <Select
-                  label="Sort by"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   options={[
@@ -496,8 +489,9 @@ const TasksPage: React.FC = () => {
       </DashboardLayout>
 
       <Modal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)}>
-        <div className="space-y-4">
-          <div>
+        <div className="flex min-h-0 flex-1 flex-col">
+          {/* Fixed Header */}
+          <div className="shrink-0 border-b border-main-100 pb-3 pr-8">
             <h2 className="text-2xl font-semibold text-main-700">
               {editingTaskId ? "Edit task" : "Create task"}
             </h2>
@@ -508,96 +502,100 @@ const TasksPage: React.FC = () => {
             </p>
           </div>
 
-          <Input
-            label="Task title"
-            value={newTask.title}
-            onChange={(e) =>
-              setNewTask((prev) => ({ ...prev, title: e.target.value }))
-            }
-            className="w-full"
-          />
-          <Input
-            label="Due date"
-            type="date"
-            value={newTask.dueDate}
-            onChange={(e) =>
-              setNewTask((prev) => ({ ...prev, dueDate: e.target.value }))
-            }
-            className="w-full"
-          />
-          <Select
-            label="Priority"
-            value={newTask.priority}
-            onChange={(e) =>
-              setNewTask((prev) => ({
-                ...prev,
-                priority: e.target.value as TaskDraft["priority"],
-              }))
-            }
-            options={[
-              { label: "High", value: "High" },
-              { label: "Medium", value: "Medium" },
-              { label: "Low", value: "Low" },
-            ]}
-          />
-          <Select
-            label="Category"
-            value={newTask.category}
-            onChange={(e) =>
-              setNewTask((prev) => ({ ...prev, category: e.target.value }))
-            }
-            options={categories.map((category) => ({
-              label: category,
-              value: category,
-            }))}
-          />
+          {/* Scrollable Body */}
+          <div className="min-h-0 flex-1 overflow-y-auto space-y-4 py-4 pr-1">
+            <Input
+              label="Task title"
+              value={newTask.title}
+              onChange={(e) =>
+                setNewTask((prev) => ({ ...prev, title: e.target.value }))
+              }
+              className="w-full"
+            />
+            <Input
+              label="Due date"
+              type="date"
+              value={newTask.dueDate}
+              onChange={(e) =>
+                setNewTask((prev) => ({ ...prev, dueDate: e.target.value }))
+              }
+              className="w-full"
+            />
+            <Select
+              label="Priority"
+              value={newTask.priority}
+              onChange={(e) =>
+                setNewTask((prev) => ({
+                  ...prev,
+                  priority: e.target.value as TaskDraft["priority"],
+                }))
+              }
+              options={[
+                { label: "High", value: "High" },
+                { label: "Medium", value: "Medium" },
+                { label: "Low", value: "Low" },
+              ]}
+            />
+            <Select
+              label="Category"
+              value={newTask.category}
+              onChange={(e) =>
+                setNewTask((prev) => ({ ...prev, category: e.target.value }))
+              }
+              options={categories.map((category) => ({
+                label: category,
+                value: category,
+              }))}
+            />
 
-          <div className="space-y-3">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-main-700">
-                Pictures
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleTaskImagesChange}
-                className="block w-full rounded-lg border border-main-300 bg-white px-4 py-2 text-sm text-main-700 file:mr-4 file:rounded-lg file:border-0 file:bg-main-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-main-700 hover:file:bg-main-200 focus:outline-none focus:ring-2 focus:ring-main-400"
-              />
-            </div>
-
-            {newTask.images.length > 0 && (
-              <div className="grid gap-3">
-                {newTask.images.map((image, index) => (
-                  <div
-                    key={image.id}
-                    className="grid gap-3 rounded-2xl border border-main-200 p-3 sm:grid-cols-[96px_minmax(0,1fr)_auto] sm:items-start"
-                  >
-                    <img
-                      src={image.url}
-                      alt={image.caption || `Task picture ${index + 1}`}
-                      className="h-24 w-full rounded-xl object-cover sm:w-24"
-                    />
-                    <Input
-                      label="Caption"
-                      placeholder="Write image caption..."
-                      value={image.caption}
-                      onChange={(e) => updateTaskImageCaption(image.id, e.target.value)}
-                      className="w-full"
-                    />
-                    <Button
-                      label="Remove"
-                      variant="danger"
-                      className="px-3 py-2 text-xs"
-                      onClick={() => removeTaskImage(image.id)}
-                    />
-                  </div>
-                ))}
+            <div className="space-y-3">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-main-700">
+                  Pictures
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleTaskImagesChange}
+                  className="block w-full rounded-lg border border-main-300 bg-white px-4 py-2 text-sm text-main-700 file:mr-4 file:rounded-lg file:border-0 file:bg-main-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-main-700 hover:file:bg-main-200 focus:outline-none"
+                />
               </div>
-            )}
+
+              {newTask.images.length > 0 && (
+                <div className="grid gap-3">
+                  {newTask.images.map((image, index) => (
+                    <div
+                      key={image.id}
+                      className="grid gap-3 rounded-2xl border border-main-200 p-3 sm:grid-cols-[96px_minmax(0,1fr)_auto] sm:items-start"
+                    >
+                      <img
+                        src={image.url}
+                        alt={image.caption || `Task picture ${index + 1}`}
+                        className="h-24 w-full rounded-xl object-cover sm:w-24"
+                      />
+                      <Input
+                        label="Caption"
+                        placeholder="Write image caption..."
+                        value={image.caption}
+                        onChange={(e) => updateTaskImageCaption(image.id, e.target.value)}
+                        className="w-full"
+                      />
+                      <Button
+                        label="Remove"
+                        variant="danger"
+                        className="px-3 py-2 text-xs"
+                        onClick={() => removeTaskImage(image.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="flex justify-end gap-3">
+          {/* Fixed Footer */}
+          <div className="shrink-0 flex justify-end gap-3 border-t border-main-200 pt-3 mt-1">
             <Button
               label="Cancel"
               variant="secondary"
@@ -663,7 +661,7 @@ const TasksPage: React.FC = () => {
                       type="button"
                       key={image.id}
                       onClick={() => setViewingImage(image)}
-                      className="overflow-hidden rounded-2xl border border-main-200 bg-white text-left transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-main-400"
+                      className="overflow-hidden rounded-2xl border border-main-200 bg-white text-left transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none"
                     >
                       <img
                         src={image.url}

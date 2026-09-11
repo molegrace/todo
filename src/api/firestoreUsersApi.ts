@@ -2,12 +2,28 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import type { User } from "firebase/auth";
 import { db } from "../firebase";
 
+export type SocialLinks = {
+  twitter?: string;
+  github?: string;
+  linkedin?: string;
+  website?: string;
+};
+
 export type UserProfileDoc = {
   uid: string;
   email: string | null;
   displayName: string | null;
+  photoURL: string | null;
+  socialLinks?: SocialLinks;
   createdAt: string;
   updatedAt: string;
+};
+
+export const getUserProfileDoc = async (uid: string): Promise<UserProfileDoc | null> => {
+  const ref = doc(db, "users", uid);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) return null;
+  return snapshot.data() as UserProfileDoc;
 };
 
 export const ensureUserProfileDoc = async (user: User): Promise<void> => {
@@ -19,6 +35,7 @@ export const ensureUserProfileDoc = async (user: User): Promise<void> => {
     uid: user.uid,
     email: user.email ?? null,
     displayName: user.displayName ?? null,
+    photoURL: user.photoURL ?? null,
     updatedAt: now,
   };
 
@@ -36,7 +53,7 @@ export const ensureUserProfileDoc = async (user: User): Promise<void> => {
 
 export const updateUserProfileDoc = async (
   user: User,
-  updates: Partial<Pick<UserProfileDoc, "displayName" | "email">>
+  updates: Partial<Pick<UserProfileDoc, "displayName" | "email" | "photoURL" | "socialLinks">>
 ): Promise<void> => {
   const ref = doc(db, "users", user.uid);
   const now = new Date().toISOString();

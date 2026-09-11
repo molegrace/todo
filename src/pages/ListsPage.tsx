@@ -1,23 +1,20 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
-import Card from "../components/Card";
-import Checkbox from "../components/Checkbox";
 import DashboardLayout from "../components/DashboardLayout";
 import Input from "../components/Input";
 import Modal from "../components/Modal";
-import {
-  priorityTone,
-  useDashboard,
-} from "../context/DashboardContext";
+import Table from "../components/Table";
+import { useDashboard } from "../context/DashboardContext";
 
 const ListsPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     categories,
     tasks,
     addCategory,
     renameCategory,
     deleteCategory,
-    toggleTaskStatus,
   } = useDashboard();
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCategory, setNewCategory] = useState("");
@@ -31,13 +28,14 @@ const ListsPage: React.FC = () => {
     }
   }, [categories, selectedCategory]);
 
-  const categoryCards = useMemo(
+  const categoryTableData = useMemo(
     () =>
       categories.map((category) => {
         const categoryTasks = tasks.filter((task) => task.category === category);
         const done = categoryTasks.filter((task) => task.completed).length;
 
         return {
+          id: category,
           label: category,
           total: categoryTasks.length,
           done,
@@ -45,14 +43,6 @@ const ListsPage: React.FC = () => {
         };
       }),
     [categories, tasks]
-  );
-
-  const visibleTasks = useMemo(
-    () =>
-      tasks
-        .filter((task) => task.category === selectedCategory)
-        .sort((a, b) => a.dueDate.localeCompare(b.dueDate)),
-    [selectedCategory, tasks]
   );
 
   const handleAddCategory = () => {
@@ -65,9 +55,7 @@ const ListsPage: React.FC = () => {
   };
 
   const handleCategoryClick = (category: string) => {
-    setSelectedCategory(category);
-    setCategoryDraft(category);
-    setIsManageCategoryModalOpen(true);
+    navigate(`/dashboard/lists/${encodeURIComponent(category)}`);
   };
 
   const handleUpdateCategory = () => {
@@ -92,7 +80,7 @@ const ListsPage: React.FC = () => {
   return (
     <>
       <DashboardLayout
-        title="Lists & Categories"
+        title=""
         actions={
           <Button
             label="+ New list"
@@ -101,130 +89,85 @@ const ListsPage: React.FC = () => {
           />
         }
       >
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {categoryCards.map((category) => (
-            <button
-              key={category.label}
-              type="button"
-              onClick={() => handleCategoryClick(category.label)}
-              className={`rounded-[2rem] border p-5 text-left shadow-sm transition ${
-                selectedCategory === category.label
-                  ? "border-main-400 bg-white text-main-700 shadow-lg ring-2 ring-main-200"
-                  : "border-main-200 bg-white hover:-translate-y-1 hover:shadow-lg"
-              }`}
-            >
-              <p
-                className={`text-xs font-semibold uppercase tracking-[0.24em] ${
-                  selectedCategory === category.label ? "text-main-500" : "text-main-500"
-                }`}
-              >
-                List
-              </p>
-              <h3 className="mt-3 text-2xl font-bold text-black">{category.label}</h3>
-              <div className="mt-5 grid grid-cols-3 gap-3">
-                <div
-                  className={`rounded-2xl px-3 py-3 ${
-                    selectedCategory === category.label
-                      ? "bg-white"
-                      : "bg-main-50"
-                  }`}
-                >
-                  <p className="text-xs opacity-70">Total</p>
-                  <p className="mt-2 text-xl font-semibold">{category.total}</p>
-                </div>
-                <div
-                  className={`rounded-2xl px-3 py-3 ${
-                    selectedCategory === category.label
-                      ? "bg-white"
-                      : "bg-main-50"
-                  }`}
-                >
-                  <p className="text-xs opacity-70">Done</p>
-                  <p className="mt-2 text-xl font-semibold">{category.done}</p>
-                </div>
-                <div
-                  className={`rounded-2xl px-3 py-3 ${
-                    selectedCategory === category.label
-                      ? "bg-white"
-                      : "bg-main-50"
-                  }`}
-                >
-                  <p className="text-xs opacity-70">Pending</p>
-                  <p className="mt-2 text-xl font-semibold">{category.pending}</p>
-                </div>
-              </div>
-            </button>
-          ))}
-        </section>
-
-        <section className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
-          <Card className="space-y-5 p-6 shadow-lg">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-main-500">
-                  Selected list
-                </p>
-                <h2 className="mt-2 text-2xl font-bold text-main-700">
-                  {selectedCategory}
-                </h2>
-              </div>
-              <span className="rounded-full bg-main-100 px-4 py-2 text-sm font-medium text-main-600">
-                {visibleTasks.length} task(s)
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              {visibleTasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="flex flex-col gap-4 rounded-2xl border border-main-100 bg-white px-4 py-4 lg:flex-row lg:items-center lg:justify-between"
-                >
-                  <div>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <p className="font-semibold text-main-700">{task.title}</p>
-                      <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${priorityTone[task.priority]}`}
+        {/* Borderless Categories Table */}
+        <div className="py-2">
+          <Table
+            data={categoryTableData}
+            emptyMessage="No categories available."
+            borderless
+            columns={[
+              {
+                header: "Category Name",
+                accessor: "label",
+                render: (cat) => (
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryClick(cat.label)}
+                    className="font-bold text-main-700 hover:text-main-500 hover:underline text-left"
+                  >
+                    {cat.label}
+                  </button>
+                ),
+              },
+              {
+                header: "Total Tasks",
+                accessor: "total",
+                render: (cat) => <span className="font-semibold text-main-700">{cat.total}</span>,
+              },
+              {
+                header: "Done",
+                accessor: "done",
+                render: (cat) => (
+                  <span className="font-semibold text-green-600">{cat.done}</span>
+                ),
+              },
+              {
+                header: "Pending",
+                accessor: "pending",
+                render: (cat) => (
+                  <span className="font-semibold text-orange-600">{cat.pending}</span>
+                ),
+              },
+              {
+                id: "actions",
+                header: "Actions",
+                accessor: "id",
+                className: "text-right",
+                render: (cat) => (
+                  <div className="flex justify-end">
+                    <Button
+                      variant="secondary"
+                      className="px-2.5 py-1.5"
+                      title="View category details"
+                      aria-label="View category details"
+                      onClick={() => handleCategoryClick(cat.label)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 text-main-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="2"
                       >
-                        {task.priority}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm text-main-500">
-                      Due {task.dueDate} • Created {task.createdAt}
-                    </p>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    </Button>
                   </div>
-
-                  <Checkbox
-                    checked={task.completed}
-                    onChange={() => toggleTaskStatus(task.id)}
-                    label={task.completed ? "Done" : "Pending"}
-                  />
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card className="space-y-4 p-6 shadow-lg">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-main-500">
-                Why this page?
-              </p>
-              <h3 className="mt-2 text-2xl font-bold text-main-700">
-                Less clutter, better focus
-              </h3>
-            </div>
-            <div className="space-y-3 text-sm leading-7 text-main-500">
-              <p>
-                Categories now live in their own area, so the main dashboard can stay focused on daily progress.
-              </p>
-              <p>
-                Pick a list to review only the tasks inside it, instead of scanning everything at once.
-              </p>
-              <p>
-                Use this page whenever you want to understand workload by category or clean up your task organization.
-              </p>
-            </div>
-          </Card>
-        </section>
+                ),
+              },
+            ]}
+          />
+        </div>
       </DashboardLayout>
 
       <Modal

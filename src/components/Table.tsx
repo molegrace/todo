@@ -12,15 +12,23 @@ type TableProps<T> = {
   data: T[];
   columns: Column<T>[];
   emptyMessage?: string;
+  containerClassName?: string;
+  borderless?: boolean;
 };
 
 function Table<T extends { id: string | number }>({
   data,
   columns,
   emptyMessage = "No data available.",
+  containerClassName = "",
+  borderless = false,
 }: TableProps<T>) {
   return (
-    <div className="max-w-full overflow-x-auto rounded-2xl border border-main-200">
+    <div
+      className={`max-w-full overflow-x-auto ${
+        borderless ? "" : "rounded-2xl border border-main-200"
+      } ${containerClassName}`}
+    >
       <table className="min-w-[720px] bg-white sm:min-w-full">
         <thead className="bg-main-100 text-left text-sm text-main-600">
           <tr>

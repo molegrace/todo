@@ -3,9 +3,10 @@ import React from "react";
 export type ButtonVariant = "primary" | "secondary" | "danger";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  label: string;
+  label?: React.ReactNode;
   variant?: ButtonVariant;
   onClick?: () => void;
+  children?: React.ReactNode;
 }
 
 const baseStyle =
@@ -19,6 +20,7 @@ const variantStyles: Record<ButtonVariant, string> = {
 
 export const Button: React.FC<ButtonProps> = ({
   label,
+  children,
   variant = "primary",
   className = "",
   ...props
@@ -28,7 +30,7 @@ export const Button: React.FC<ButtonProps> = ({
       className={`${baseStyle} ${variantStyles[variant]} ${className}`}
       {...props}
     >
-      {label}
+      {label ?? children}
     </button>
   );
 };

@@ -49,6 +49,11 @@ export const setUserDisplayName = (
   displayName: string
 ): Promise<void> => updateProfile(user, { displayName });
 
+export const setUserProfile = (
+  user: User,
+  updates: { displayName?: string; photoURL?: string | null }
+): Promise<void> => updateProfile(user, updates);
+
 export const loginWithEmailPassword = async (
   email: string,
   password: string

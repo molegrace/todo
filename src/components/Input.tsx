@@ -12,7 +12,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   label,
   error,
   fullWidth = true,
-  variant = "outlined",
+  variant = "underline",
   passwordToggle = false,
   className = "",
   id,
@@ -22,18 +22,18 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   const inputId = id || props.name;
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
   const inputStyle =
-    variant === "underline"
+    variant === "outlined"
       ? `
-          rounded-none border-0 border-b px-0 py-2
-          focus:border-b-2 focus:ring-0
-          disabled:bg-transparent
-          ${error ? "border-red-500 focus:border-red-500" : "border-main-300 bg-transparent text-main-700 focus:border-main-500"}
+          rounded-lg border border-main-300 bg-white px-3 py-2 text-main-700
+          focus:outline-none focus:ring-0 focus:border-main-600
+          disabled:bg-main-100
+          ${error ? "border-red-500" : ""}
         `
       : `
-          rounded-lg border px-4 py-2
-          focus:ring-2
-          disabled:bg-main-100
-          ${error ? "border-red-500 focus:ring-red-500" : "border-main-300 bg-white text-main-700 focus:ring-main-400"}
+          rounded-none border-0 border-b border-main-300 bg-transparent px-1 py-2 text-main-700
+          focus:outline-none focus:ring-0 focus:border-b-2 focus:border-main-700
+          disabled:bg-transparent
+          ${error ? "border-red-500 focus:border-red-500" : ""}
         `;
 
   return (
@@ -55,7 +55,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
           className={`
             min-w-0 w-full
             transition duration-200
-            focus:outline-none
+            focus:outline-none focus:ring-0
             disabled:cursor-not-allowed
             ${passwordToggle ? "pr-11" : ""}
             ${inputStyle}
@@ -68,7 +68,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
           <button
             type="button"
             onClick={() => setIsPasswordVisible((visible) => !visible)}
-            className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-main-500 transition hover:text-main-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-main-400"
+            className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-main-500 transition hover:text-main-700 focus:outline-none"
             aria-label={isPasswordVisible ? "Hide password" : "Show password"}
             aria-pressed={isPasswordVisible}
           >

@@ -9,6 +9,7 @@ import Homepage from "./pages/Homepage";
 import DashboardPage from "./pages/DashboardPage";
 import TasksPage from "./pages/TasksPage";
 import ListsPage from "./pages/ListsPage";
+import CategoryDetailPage from "./pages/CategoryDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import { DashboardProvider } from "./context/DashboardContext";
 import { AuthProvider } from "./context/AuthContext";
@@ -43,6 +44,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ListsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/lists/:categoryName"
+              element={
+                <ProtectedRoute>
+                  <CategoryDetailPage />
                 </ProtectedRoute>
               }
             />
