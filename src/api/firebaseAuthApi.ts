@@ -7,11 +7,19 @@ import {
   type UserCredential,
 } from "firebase/auth";
 import { auth } from "../firebase";
+import {
+  clearAuthSession,
+  startAuthSession,
+} from "../services/auth/sessionExpiry";
 
 export const registerWithEmailPassword = (
   email: string,
   password: string
-): Promise<UserCredential> => createUserWithEmailAndPassword(auth, email, password);
+): Promise<UserCredential> =>
+  createUserWithEmailAndPassword(auth, email, password).then((credential) => {
+    startAuthSession(credential.user.uid);
+    return credential;
+  });
 
 export const setUserDisplayName = (
   user: User,
@@ -21,6 +29,13 @@ export const setUserDisplayName = (
 export const loginWithEmailPassword = (
   email: string,
   password: string
-): Promise<UserCredential> => signInWithEmailAndPassword(auth, email, password);
+): Promise<UserCredential> =>
+  signInWithEmailAndPassword(auth, email, password).then((credential) => {
+    startAuthSession(credential.user.uid);
+    return credential;
+  });
 
-export const logoutFirebase = (): Promise<void> => signOut(auth);
+export const logoutFirebase = async (): Promise<void> => {
+  await signOut(auth);
+  clearAuthSession();
+};

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "./Button";
 import Input from "./Input";
 import { getLoginErrorDetails, loginUser, type LoginField } from "../services/auth/loginService";
+import todoImage from "../assets/todo_image.jpg";
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
@@ -39,9 +40,10 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-main-50 via-white to-primary-100">
-      <div className="auth-card-border w-80">
-        <div className="auth-card-surface bg-white p-8">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-main-50 via-white to-primary-100 px-4 py-10">
+      <div className="grid w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-xl shadow-main-900/10 md:grid-cols-2">
+        <div className="flex items-center p-8 sm:p-10">
+          <div className="w-full">
           <h2 className="mb-6 text-center text-2xl font-bold text-main-700">
             Login
           </h2>
@@ -61,6 +63,7 @@ const LoginForm: React.FC = () => {
               name="email"
               type="email"
               placeholder="Enter your email"
+              variant="underline"
               className="w-full"
               value={formData.email}
               onChange={handleChange}
@@ -72,6 +75,8 @@ const LoginForm: React.FC = () => {
               name="password"
               type="password"
               placeholder="Enter your password"
+              variant="underline"
+              passwordToggle
               className="w-full"
               value={formData.password}
               onChange={handleChange}
@@ -96,6 +101,15 @@ const LoginForm: React.FC = () => {
               Register
             </Link>
           </p>
+          </div>
+        </div>
+
+        <div className="min-h-64 md:min-h-full">
+          <img
+            src={todoImage}
+            alt="To-do list stationery"
+            className="h-full w-full object-cover"
+          />
         </div>
       </div>
     </div>

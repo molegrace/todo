@@ -8,6 +8,7 @@ import {
   registerUser,
   type RegisterField,
 } from "../services/auth/registerService";
+import todoImage from "../assets/todo_image.jpg";
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -58,8 +59,9 @@ const SignupPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-main-50 via-white to-primary-100 px-4 py-10 sm:py-16">
-      <div className="auth-card-border mx-auto w-full max-w-md">
-        <div className="auth-card-surface bg-white p-6">
+      <div className="mx-auto grid w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-xl shadow-main-900/10 md:grid-cols-2">
+        <div className="flex items-center p-6 sm:p-10">
+          <div className="w-full">
           <h2 className="mb-6 text-center text-3xl font-bold text-main-700">Sign Up</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,6 +78,7 @@ const SignupPage: React.FC = () => {
               label="Full Name"
               name="name"
               placeholder="Enter your name"
+              variant="underline"
               className="w-full"
               value={formData.name}
               onChange={handleChange}
@@ -88,6 +91,7 @@ const SignupPage: React.FC = () => {
               name="email"
               type="email"
               placeholder="Enter your email"
+              variant="underline"
               className="w-full"
               value={formData.email}
               onChange={handleChange}
@@ -100,6 +104,8 @@ const SignupPage: React.FC = () => {
               name="password"
               type="password"
               placeholder="Enter your password"
+              variant="underline"
+              passwordToggle
               className="w-full"
               value={formData.password}
               onChange={handleChange}
@@ -112,6 +118,8 @@ const SignupPage: React.FC = () => {
               name="confirmPassword"
               type="password"
               placeholder="Confirm your password"
+              variant="underline"
+              passwordToggle
               className="w-full"
               value={formData.confirmPassword}
               onChange={handleChange}
@@ -149,6 +157,15 @@ const SignupPage: React.FC = () => {
               </Link>
             </p>
           </form>
+          </div>
+        </div>
+
+        <div className="min-h-64 md:min-h-full">
+          <img
+            src={todoImage}
+            alt="To-do list stationery"
+            className="h-full w-full object-cover"
+          />
         </div>
       </div>
     </div>
